@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ConnectionList>
+  <Connection>
+    <LogicalName>YourConnection</LogicalName>
+    <AccountName>your_account_name</AccountName>
+    <SharedKey>your_shared_key</SharedKey>
+    <UseHTTPS>True</UseHTTPS>
+  </Connection>
+  <Connection>
+    <LogicalName>Simulator</LogicalName>
+    <AccountName>devstoreaccount1</AccountName>
+    <SharedKey>Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==</SharedKey>
+    <UseHTTPS>False</UseHTTPS>
+  </Connection>
+</ConnectionList>
