@@ -139,7 +139,6 @@ namespace ITPCfSQL.Azure.Internal
         {
             string strUrl = string.Format("{0:S}/{1:S}", GetQueueUrl(useHTTPS, accountName), queueName);
 
-            //string strUrl = string.Format("{0:S}://{1:S}.queue.core.windows.net/{2:S}", useHTTPS ? "https" : "http", accountName, queueName);
             if (timeoutSeconds > 0)
                 strUrl += string.Format("?timeout={0:S}", timeoutSeconds.ToString());
 
@@ -186,7 +185,6 @@ namespace ITPCfSQL.Azure.Internal
             string xmsclientrequestId = null
             )
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.queue.core.windows.net/{2:S}", useHTTPS ? "https" : "http", accountName, queueName);
             string strUrl = string.Format("{0:S}/{1:S}", GetQueueUrl(useHTTPS, accountName), queueName);
 
             if (timeoutSeconds > 0)
@@ -233,8 +231,6 @@ namespace ITPCfSQL.Azure.Internal
             string xmsclientrequestId = null
         )
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.queue.core.windows.net/{2:S}/messages", useHTTPS ? "https" : "http", accountName, queueName);
-
             string strUrl = string.Format("{0:S}/{1:S}/messages", GetQueueUrl(useHTTPS, accountName), queueName);
 
             if (timeoutSeconds > 0)
@@ -282,8 +278,6 @@ namespace ITPCfSQL.Azure.Internal
             string xmsclientrequestId = null
          )
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.queue.core.windows.net/{2:S}", useHTTPS ? "https" : "http", accountName, queueName);
-
             string strUrl = string.Format("{0:S}/{1:S}", GetQueueUrl(useHTTPS, accountName), queueName);
 
             strUrl += "?comp=metadata";
@@ -336,7 +330,6 @@ namespace ITPCfSQL.Azure.Internal
             int timeoutSeconds = 0,
             string xmsclientrequestId = null)
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.queue.core.windows.net/{2:S}", useHTTPS ? "https" : "http", accountName, queueName);
             string strUrl = string.Format("{0:S}/{1:S}", GetQueueUrl(useHTTPS, accountName), queueName);
 
             strUrl += "?comp=metadata";
@@ -384,7 +377,6 @@ namespace ITPCfSQL.Azure.Internal
             int timeoutSeconds = 0,
             string xmsclientrequestId = null)
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.queue.core.windows.net/{2:S}", useHTTPS ? "https" : "http", accountName, queueName);
             string strUrl = string.Format("{0:S}/{1:S}", GetQueueUrl(useHTTPS, accountName), queueName);
 
             strUrl += "?comp=acl";
@@ -432,7 +424,6 @@ namespace ITPCfSQL.Azure.Internal
             string accountName,
             int timeoutSeconds = 0)
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.queue.core.windows.net/", useHTTPS ? "https" : "http", accountName);
             string strUrl = string.Format("{0:S}", GetQueueUrl(useHTTPS, accountName));
 
             strUrl += "?restype=service&comp=properties";
@@ -481,7 +472,6 @@ namespace ITPCfSQL.Azure.Internal
             int timeoutSeconds = 0,
             Guid? xmsclientrequestId = null)
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.queue.core.windows.net/{2:S}/messages", useHTTPS ? "https" : "http", accountName, queueName);
             string strUrl = string.Format("{0:S}/{1:S}/messages", GetQueueUrl(useHTTPS, accountName), queueName);
 
             strUrl += string.Format("?visibilitytimeout={0:S}", visibilitytimeoutSeconds.ToString());
@@ -534,7 +524,6 @@ namespace ITPCfSQL.Azure.Internal
             int timeoutSeconds = 0,
             string xmsclientrequestId = null)
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.queue.core.windows.net/{2:S}/messages", useHTTPS ? "https" : "http", accountName, queueName);
             string strUrl = string.Format("{0:S}/{1:S}/messages", GetQueueUrl(useHTTPS, accountName), queueName);
 
             strUrl += "?peekonly=true";
@@ -585,7 +574,6 @@ namespace ITPCfSQL.Azure.Internal
                 int timeoutSeconds = 0,
                 Guid? xmsclientrequestId = null)
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.queue.core.windows.net/{2:S}/messages/{3:S}", useHTTPS ? "https" : "http", accountName, queueName, messageId.ToString());
             string strUrl = string.Format("{0:S}/{1:S}/messages/{2:S}", GetQueueUrl(useHTTPS, accountName), queueName, messageId.ToString());
 
 
@@ -639,7 +627,6 @@ namespace ITPCfSQL.Azure.Internal
                 int timeoutSeconds = 0,
                 string xmsclientrequestId = null)
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.queue.core.windows.net/{2:S}/messages/{3:S}", useHTTPS ? "https" : "http", accountName, queueName, messageId.ToString());
             string strUrl = string.Format("{0:S}/{1:S}/messages/{2:S}", GetQueueUrl(useHTTPS, accountName), queueName, messageId.ToString());
 
             strUrl += "?popreceipt=" + popreceipt;
@@ -697,7 +684,6 @@ namespace ITPCfSQL.Azure.Internal
                 int timeoutSeconds = 0,
                 Guid? xmsclientrequestId = null)
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.queue.core.windows.net/{2:S}/messages", useHTTPS ? "https" : "http", accountName, queueName);
             string strUrl = string.Format("{0:S}/{1:S}/messages", GetQueueUrl(useHTTPS, accountName), queueName);
 
             string sQueryFormat = "?";
@@ -773,7 +759,6 @@ namespace ITPCfSQL.Azure.Internal
             string tableName,
             string xmsclientrequestId = null)
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.table.core.windows.net/Tables", useHTTPS ? "https" : "http", accountName);
             string strUrl = string.Format("{0:S}/Tables", GetTableUrl(useHTTPS, accountName));
 
             System.Net.HttpWebRequest Request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(strUrl);
@@ -830,7 +815,6 @@ namespace ITPCfSQL.Azure.Internal
             string accountName,
             string xmsclientrequestId = null)
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.table.core.windows.net/Tables", useHTTPS ? "https" : "http", accountName);
             string strUrl = string.Format("{0:S}/Tables", GetTableUrl(useHTTPS, accountName));
 
             System.Net.HttpWebRequest Request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(strUrl);
@@ -880,7 +864,6 @@ namespace ITPCfSQL.Azure.Internal
             string tableName,
             string xmsclientrequestId = null)
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.table.core.windows.net/{2:S}()", useHTTPS ? "https" : "http", accountName, tableName);
             string strUrl = string.Format("{0:S}/{1:S}()", GetTableUrl(useHTTPS, accountName), tableName);
 
             System.Net.HttpWebRequest Request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(strUrl);
@@ -930,9 +913,6 @@ namespace ITPCfSQL.Azure.Internal
             TableEntity te,
             string xmsclientrequestId = null)
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.table.core.windows.net/{2:S}(PartitionKey='{3:S}',RowKey='{4:S}')", useHTTPS ? "https" : "http", accountName, tableName,
-            //    te.PartitionKey, te.RowKey);
-
             string strUrl = string.Format("{0:S}/{1:S}(PartitionKey='{2:S}',RowKey='{3:S}')", GetTableUrl(useHTTPS, accountName), tableName,
                 te.PartitionKey, te.RowKey);
 
@@ -985,9 +965,6 @@ namespace ITPCfSQL.Azure.Internal
             TableEntity te,
             string xmsclientrequestId = null)
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.table.core.windows.net/{2:S}(PartitionKey='{3:S}',RowKey='{4:S}')", useHTTPS ? "https" : "http", accountName, tableName,
-            //    te.PartitionKey, te.RowKey);
-
             string strUrl = string.Format("{0:S}/{1:S}(PartitionKey='{2:S}',RowKey='{3:S}')", GetTableUrl(useHTTPS, accountName), tableName,
                 te.PartitionKey, te.RowKey);
 
@@ -1094,7 +1071,6 @@ namespace ITPCfSQL.Azure.Internal
             int timeoutSeconds = 0,
             Guid? xmsclientrequestId = null)
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.blob.core.windows.net?comp=list", useHTTPS ? "https" : "http", accountName);
             string strUrl = string.Format("{0:S}?comp=list", GetBlobStorageUrl(useHTTPS, accountName));
 
             if (!string.IsNullOrEmpty(nextMarker))
@@ -1150,8 +1126,7 @@ namespace ITPCfSQL.Azure.Internal
             string xmsclientrequestId = null
             )
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.blob.core.windows.net/{2:S}?restype=container", useHTTPS ? "https" : "http", accountName, containerName);
-            string strUrl = string.Format("{0:S}/{1:S}?restype=container", GetBlobStorageUrl(useHTTPS, accountName), containerName);
+           string strUrl = string.Format("{0:S}/{1:S}?restype=container", GetBlobStorageUrl(useHTTPS, accountName), containerName);
 
             if (timeoutSeconds > 0)
                 strUrl += string.Format("&timeout={0:S}", timeoutSeconds.ToString());
@@ -1209,7 +1184,6 @@ namespace ITPCfSQL.Azure.Internal
             string xmsclientrequestId = null
             )
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.blob.core.windows.net/{2:S}?restype=container", useHTTPS ? "https" : "http", accountName, containerName);
             string strUrl = string.Format("{0:S}/{1:S}?restype=container", GetBlobStorageUrl(useHTTPS, accountName), containerName);
             if (timeoutSeconds > 0)
                 strUrl += string.Format("&timeout={0:S}", timeoutSeconds.ToString());
@@ -1267,7 +1241,6 @@ namespace ITPCfSQL.Azure.Internal
             int timeoutSeconds = 0,
             string xmsclientrequestId = null)
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.blob.core.windows.net/{2:S}?restype=container&comp=list", useHTTPS ? "https" : "http", accountName, containerName);
             string strUrl = string.Format("{0:S}/{1:S}?restype=container&comp=list", GetBlobStorageUrl(useHTTPS, accountName), containerName);
 
             if (!string.IsNullOrEmpty(nextMarker))
@@ -1374,7 +1347,6 @@ namespace ITPCfSQL.Azure.Internal
                 throw new ArgumentException("Cannot specify a contentMD5 with an empty (null) inputStream.");
             #endregion
 
-            //string strUrl = string.Format("{0:S}://{1:S}.blob.core.windows.net/{2:S}/{3:S}", useHTTPS ? "https" : "http", accountName, containerName, blobName);
             string strUrl = string.Format("{0:S}/{1:S}/{2:S}", GetBlobStorageUrl(useHTTPS, accountName), containerName, blobName);
 
             if (timeoutSeconds > 0)
@@ -1627,7 +1599,6 @@ namespace ITPCfSQL.Azure.Internal
             string xmsclientrequestId = null
             )
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.blob.core.windows.net/{2:S}/{3:S}", useHTTPS ? "https" : "http", accountName, containerName, blobName);
             string strUrl = string.Format("{0:S}/{1:S}/{2:S}", GetBlobStorageUrl(useHTTPS, accountName), containerName, blobName);
 
             char cConc = '?';
@@ -1776,7 +1747,6 @@ namespace ITPCfSQL.Azure.Internal
             int timeoutSeconds = 0,
             Guid? xmsclientrequestId = null)
         {
-            //string strUrl = string.Format("{0:S}://{1:S}.blob.core.windows.net/{2:S}/{3:S}", useHTTPS ? "https" : "http", accountName, containerName, blobName);
             string strUrl = string.Format("{0:S}/{1:S}/{2:S}", GetBlobStorageUrl(useHTTPS, accountName), containerName, blobName);
 
             char cConc = '?';
