@@ -200,7 +200,6 @@ namespace ITPCfSQL.Azure.CLR
                 1024 * 64, System.IO.FileOptions.RandomAccess))
             {
                 fs.Seek(lOffsetBytes.Value, System.IO.SeekOrigin.Begin);
-
                 fs.Read(bBuffer, 0, iLengthBytes.Value);
             }
 
