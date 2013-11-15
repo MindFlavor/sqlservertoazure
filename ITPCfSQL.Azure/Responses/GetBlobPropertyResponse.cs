@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ITPCfSQL.Azure.Responses
 {
@@ -35,9 +33,10 @@ namespace ITPCfSQL.Azure.Responses
             LastModified = DateTime.Parse(dHeaders["Last-Modified"]);
             
             MetaNames = new Dictionary<string, string>();
-            foreach (KeyValuePair<string, string> sElem in dHeaders.Where(item => item.Key.StartsWith("x-ms-meta-")))
-                MetaNames.Add(sElem.Key, sElem.Value);
 
+            foreach(KeyValuePair<string, string> sElem in dHeaders)
+                if(sElem.Key.StartsWith("x-ms-meta-"))
+                    MetaNames.Add(sElem.Key, sElem.Value);
 
             BlobType = (Enumerations.BlobType)Enum.Parse(typeof(Enumerations.BlobType), dHeaders["x-ms-blob-type"], true);
 

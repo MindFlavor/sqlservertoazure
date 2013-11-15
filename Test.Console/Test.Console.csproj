@@ -4,16 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1B74A3BB-050E-4996-BAF5-FC9883D75350}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{5A836EB1-149F-4E5E-96C5-0277E9518B78}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ITPCfSQL.Azure</RootNamespace>
-    <AssemblyName>ITPCfSQL.Azure</AssemblyName>
+    <RootNamespace>Test.Console</RootNamespace>
+    <AssemblyName>Test.Console</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -21,22 +21,15 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>tempKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -48,42 +41,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AzureBlobService.cs" />
-    <Compile Include="AzureQueueService.cs" />
-    <Compile Include="AzureService.cs" />
-    <Compile Include="AzureTableService.cs" />
-    <Compile Include="Blob.cs" />
-    <Compile Include="BlockBlob.cs" />
-    <Compile Include="Container.cs" />
-    <Compile Include="Enumerations\BlobCopyStatus.cs" />
-    <Compile Include="Enumerations\BlobDeletionMethod.cs" />
-    <Compile Include="Enumerations\ContainerPublicReadAccess.cs" />
-    <Compile Include="CopyAttributes.cs" />
-    <Compile Include="Enumerations\BlobType.cs" />
-    <Compile Include="Enumerations\LeaseDuration.cs" />
-    <Compile Include="Enumerations\LeaseOperation.cs" />
-    <Compile Include="Enumerations\LeaseState.cs" />
-    <Compile Include="Enumerations\LeaseStatus.cs" />
-    <Compile Include="Enumerations\PutPageOperation.cs" />
-    <Compile Include="Exceptions\AzureException.cs" />
-    <Compile Include="Exceptions\UnexpectedResponseTypeCodeException.cs" />
-    <Compile Include="Responses\CopyBlobResponse.cs" />
-    <Compile Include="Internal\InternalMethods.cs" />
-    <Compile Include="Message.cs" />
-    <Compile Include="PageBlob.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Queue.cs" />
-    <Compile Include="Internal\Signature.cs" />
-    <Compile Include="Responses\AzureResponse.cs" />
-    <Compile Include="Responses\AzureResponseWithETag.cs" />
-    <Compile Include="Responses\GetBlobPropertyResponse.cs" />
-    <Compile Include="Responses\LeaseBlobResponse.cs" />
-    <Compile Include="SimpleDictTable.cs" />
-    <Compile Include="Table.cs" />
-    <Compile Include="TableEntity.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="tempKey.snk" />
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ITPCfSQL.Azure\ITPCfSQL.Azure.csproj">
+      <Project>{1b74a3bb-050e-4996-baf5-fc9883d75350}</Project>
+      <Name>ITPCfSQL.Azure</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

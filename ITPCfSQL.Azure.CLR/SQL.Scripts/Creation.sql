@@ -6,11 +6,11 @@
 USE [master];
 GO
 
-CREATE ASYMMETRIC KEY ['<asymmetric_key_name, sysname, SampleAzureKey>'] FROM EXECUTABLE FILE = '<full_file_path, nvarchar(4000), Enter the full DLL path>'
-	--'C:\GIT\itpcfsqlrepo\Projects\ITPCfSQL.Azure\ITPCfSQL.Azure.CLR\bin\Debug\ITPCfSQL.Azure.CLR.dll';
-CREATE LOGIN ['<asymmetric_login_name, sysname, SampleAzureLogin>'] FROM ASYMMETRIC KEY ['<asymmetric_key_name, sysname, SampleAzureKey>'];
+CREATE ASYMMETRIC KEY [AzureKey] FROM EXECUTABLE FILE = 'C:\GIT\itpcfsqlrepo\Projects\SQLServerToAzure\ITPCfSQL.Azure.CLR\bin\Debug\ITPCfSQL.Azure.CLR.dll'
+	--'C:\GIT\itpcfsqlrepo\Projects\SQLServerToAzure\ITPCfSQL.Azure.CLR\bin\Debug\ITPCfSQL.Azure.CLR.dll';
+CREATE LOGIN [AzureLogin] FROM ASYMMETRIC KEY [AzureKey];
 
-GRANT EXTERNAL ACCESS ASSEMBLY TO ['<asymmetric_login_name, sysname, SampleAzureLogin>'];
+GRANT EXTERNAL ACCESS ASSEMBLY TO [AzureLogin];
 GO
 
 CREATE DATABASE DemoAzureCLR;
@@ -26,7 +26,7 @@ GO
 CREATE SCHEMA [Azure.Embedded];
 GO
 
-CREATE ASSEMBLY [ITPCfSQL.Azure.CLR] FROM '<full_file_path, nvarchar(4000), Enter the full DLL path>'
+CREATE ASSEMBLY [ITPCfSQL.Azure.CLR] FROM 'C:\GIT\itpcfsqlrepo\Projects\SQLServerToAzure\ITPCfSQL.Azure.CLR\bin\Debug\ITPCfSQL.Azure.CLR.dll'
 	--'C:\GIT\itpcfsqlrepo\Projects\ITPCfSQL.Azure\ITPCfSQL.Azure.CLR\bin\Debug\ITPCfSQL.Azure.CLR.dll'
 WITH PERMISSION_SET=EXTERNAL_ACCESS;
 GO
@@ -108,11 +108,23 @@ CREATE PROCEDURE Azure.PutPage(
 	@AccountName NVARCHAR(255), @SharedKey NVARCHAR(255), @useHTTPS bit, 
 	@ContainerName NVARCHAR(4000), @BlobName NVARCHAR(4000), 
 	@buffer VARBINARY(MAX), 
-	@startPositionBytes INT, @bytesToUpload INT = NULL,
+	@startPositionBytes BIGINT, @bytesToUpload INT = NULL,
 	@leaseId UNIQUEIDENTIFIER = NULL,
 	@contentMD5 NVARCHAR(255) = NULL,
 	@timeoutSeconds INT = 0, @xmsclientrequestId UNIQUEIDENTIFIER = NULL)
 AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.AzureBlob].PutPage;
+GO
+
+CREATE FUNCTION Azure.PutPageFunction(
+	@AccountName NVARCHAR(255), @SharedKey NVARCHAR(255), @useHTTPS bit, 
+	@ContainerName NVARCHAR(4000), @BlobName NVARCHAR(4000), 
+	@buffer VARBINARY(MAX), 
+	@startPositionBytes BIGINT, @bytesToUpload INT = NULL,
+	@leaseId UNIQUEIDENTIFIER = NULL,
+	@contentMD5 NVARCHAR(255) = NULL,
+	@timeoutSeconds INT = 0, @xmsclientrequestId UNIQUEIDENTIFIER = NULL)
+	RETURNS NVARCHAR(MAX)
+AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.AzureBlob].PutPage_Function;
 GO
 
 CREATE FUNCTION Azure.CreateOrReplaceBlockBlobFunction(
@@ -443,6 +455,19 @@ CREATE PROCEDURE [Azure.Embedded].PutPage(
 AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.AzureBlob].PutPage_Embedded;
 GO
 
+CREATE FUNCTION [Azure.Embedded].PutPageFunction(
+	@logicalConnectionName NVARCHAR(255),
+	@ContainerName NVARCHAR(4000), @BlobName NVARCHAR(4000), 
+	@buffer VARBINARY(MAX), 
+	@startPositionBytes BIGINT, @bytesToUpload INT = NULL,
+	@leaseId UNIQUEIDENTIFIER = NULL,
+	@contentMD5 NVARCHAR(255) = NULL,
+	@timeoutSeconds INT = 0, @xmsclientrequestId UNIQUEIDENTIFIER = NULL)
+	RETURNS NVARCHAR(MAX)
+AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.AzureBlob].PutPage_Function_Embedded;
+GO
+
+
 -- Queue
 CREATE PROCEDURE [Azure.Embedded].CreateQueue(
 	@logicalConnectionName NVARCHAR(255),
@@ -556,6 +581,17 @@ RETURNS NVARCHAR(MAX) EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Uti
 GO
 CREATE FUNCTION [Azure].ComputeMD5AsBase64(@byteArray VARBINARY(MAX))
 RETURNS NVARCHAR(MAX) EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Utils].ComputeMD5AsBase64;
+GO
+CREATE FUNCTION [Azure].GetFileSizeBytes(@fileName NVARCHAR(4000))
+RETURNS BIGINT EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Utils].GetFileSizeBytes;
+GO
+CREATE FUNCTION [Azure].GetFileBlock(
+	@fileName NVARCHAR(4000),
+	@offsetBytes BIGINT,
+	@lengthBytes INT,
+	@fileShareOption NVARCHAR(255) = 'Read' 
+)
+RETURNS VARBINARY(MAX) EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Utils].GetFileBlock;
 GO
 
 ------

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using ITPCfSQL.Azure;
 
 namespace ITPCfSQL.Azure.CLR
@@ -199,12 +198,47 @@ namespace ITPCfSQL.Azure.CLR
                 xmsclientrequestId.IsNull ? (Guid?)null : xmsclientrequestId.Value);
         }
 
+        [SqlFunction(
+            DataAccess = DataAccessKind.None,
+            IsDeterministic = false,
+            IsPrecise = true,
+            SystemDataAccess = SystemDataAccessKind.None)]
+        public static SqlString PutPage_Function(
+            SqlString accountName, SqlString sharedKey, SqlBoolean useHTTPS,
+            SqlString containerName, SqlString blobName,
+            SqlBytes binaryBuffer,
+            SqlInt64 startPositionBytes, SqlInt32 bytesToUpload,
+            SqlGuid leaseId,
+            SqlString contentMD5,
+            SqlInt32 timeoutSeconds,
+            SqlGuid xmsclientrequestId)
+        {
+            try
+            {
+                PutPage(
+                    accountName, sharedKey, useHTTPS,
+                    containerName, blobName,
+                    binaryBuffer, 
+                    startPositionBytes, bytesToUpload,
+                    leaseId, 
+                    contentMD5, 
+                    timeoutSeconds,
+                    xmsclientrequestId);
+
+                return SqlString.Null;
+            }
+            catch (Exception exce)
+            {
+                return exce.ToString();
+            }
+        }
+
         [SqlProcedure]
         public static void PutPage(
             SqlString accountName, SqlString sharedKey, SqlBoolean useHTTPS,
             SqlString containerName, SqlString blobName,
             SqlBytes binaryBuffer,
-            SqlInt32 startPositionBytes, SqlInt32 bytesToUpload,
+            SqlInt64 startPositionBytes, SqlInt32 bytesToUpload,
             SqlGuid leaseId, SqlString contentMD5,
             SqlInt32 timeoutSeconds, SqlGuid xmsclientrequestId)
         {
@@ -552,6 +586,31 @@ namespace ITPCfSQL.Azure.CLR
             Configuration.EmbeddedConfiguration config = Configuration.EmbeddedConfiguration.GetConfigurationFromEmbeddedFile(logicalConnectionName.Value);
 
             PutPage(
+                config.AccountName, config.SharedKey, config.UseHTTPS,
+                containerName, blobName,
+                binaryBuffer, startPositionBytes, bytesToUpload, leaseId,
+                contentMD5, timeoutSeconds,
+                xmsclientrequestId);
+        }
+
+        [SqlFunction(
+            DataAccess = DataAccessKind.None,
+            IsDeterministic = false,
+            IsPrecise = true,
+            SystemDataAccess = SystemDataAccessKind.None)]
+        public static SqlString PutPage_Function_Embedded(
+            SqlString logicalConnectionName,
+            SqlString containerName, SqlString blobName,
+            SqlBytes binaryBuffer,
+            SqlInt64 startPositionBytes, SqlInt32 bytesToUpload,
+            SqlGuid leaseId,
+            SqlString contentMD5,
+            SqlInt32 timeoutSeconds,
+            SqlGuid xmsclientrequestId)
+        {
+            Configuration.EmbeddedConfiguration config = Configuration.EmbeddedConfiguration.GetConfigurationFromEmbeddedFile(logicalConnectionName.Value);
+
+            return PutPage_Function(
                 config.AccountName, config.SharedKey, config.UseHTTPS,
                 containerName, blobName,
                 binaryBuffer, startPositionBytes, bytesToUpload, leaseId,

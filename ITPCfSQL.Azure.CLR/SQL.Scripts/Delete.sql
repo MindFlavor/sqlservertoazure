@@ -7,13 +7,10 @@ GO
 DROP DATABASE DemoAzureCLR;
 GO
 
-DROP CREDENTIAL RallyCredential;
+DROP LOGIN AzureLogin;
 GO
 
-DROP LOGIN SampleAzureLogin;
-GO
-
-DROP ASYMMETRIC KEY SampleAzureKey;
+DROP ASYMMETRIC KEY AzureKey;
 GO
 
 

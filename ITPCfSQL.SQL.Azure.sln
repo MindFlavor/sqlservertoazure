@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ITPCfSQL.Azure", "ITPCfSQL.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ITPCfSQL.Azure.CLR", "ITPCfSQL.Azure.CLR\ITPCfSQL.Azure.CLR.csproj", "{BE83AA9A-8B39-4C6B-BB4A-CB4B9D82A8E9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Console", "Test.Console\Test.Console.csproj", "{5A836EB1-149F-4E5E-96C5-0277E9518B78}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,10 @@ Global
 		{BE83AA9A-8B39-4C6B-BB4A-CB4B9D82A8E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE83AA9A-8B39-4C6B-BB4A-CB4B9D82A8E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE83AA9A-8B39-4C6B-BB4A-CB4B9D82A8E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A836EB1-149F-4E5E-96C5-0277E9518B78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A836EB1-149F-4E5E-96C5-0277E9518B78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A836EB1-149F-4E5E-96C5-0277E9518B78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A836EB1-149F-4E5E-96C5-0277E9518B78}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

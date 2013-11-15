@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ITPCfSQL.Azure
 {
@@ -75,9 +73,10 @@ namespace ITPCfSQL.Azure
                 this.AzureQueueService.UseHTTPS,
                  Name, timeoutSeconds);
 
-            foreach (string key in dMetadata.Keys.Where(item => item.StartsWith(META_PREFIX)))
+            foreach (string key in dMetadata.Keys) //.Where(item => item.StartsWith(META_PREFIX)))
             {
-                Metadata[key.Substring(META_PREFIX.Length)] = dMetadata[key];
+                if (key.StartsWith(META_PREFIX))
+                    Metadata[key.Substring(META_PREFIX.Length)] = dMetadata[key];
             }
         }
 

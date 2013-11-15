@@ -1,10 +1,8 @@
 ﻿using Microsoft.SqlServer.Server;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Data.SqlClient;
-using System.Threading.Tasks;
 using System.Data.SqlTypes;
 
 namespace ITPCfSQL.Azure.CLR
@@ -156,6 +154,59 @@ namespace ITPCfSQL.Azure.CLR
             return Convert.ToBase64String(mHash);
         }
 
+        [SqlFunction
+            (IsDeterministic = true,
+            IsPrecise = true,
+            DataAccess = DataAccessKind.None,
+            SystemDataAccess = SystemDataAccessKind.None)]
+        public static SqlInt64 GetFileSizeBytes(SqlString strFileName)
+        {
+            return new System.IO.FileInfo(strFileName.Value).Length;
+        }
+
+        [SqlFunction
+            (IsDeterministic = true,
+            IsPrecise = true,
+            DataAccess = DataAccessKind.None,
+            SystemDataAccess = SystemDataAccessKind.None)]
+        public static SqlBytes GetFileBlock(SqlString strFileName, SqlInt64 lOffsetBytes, SqlInt32 iLengthBytes,
+            SqlString strFileShare)
+        {
+            System.IO.FileShare fileShare;
+            if (!Enum.TryParse<System.IO.FileShare>(strFileShare.Value, out fileShare))
+            {
+                StringBuilder sb = new StringBuilder("Invalid System.IO.FileShare value. Received " +
+                    strFileShare.Value + ". Valid values are: ");
+
+                System.IO.FileShare[] fss = (System.IO.FileShare[])Enum.GetValues(typeof(System.IO.FileShare));
+
+                for (int i = 0; i < fss.Length; i++)
+                {
+                    sb.Append(fss[i].ToString());
+                    if((i+1)<fss.Length)
+                        sb.Append(", ");
+                }
+
+                sb.Append(".");
+
+                throw new ArgumentException(sb.ToString());
+            }
+
+            byte[] bBuffer = new byte[iLengthBytes.Value];
+
+            using (System.IO.FileStream fs = new System.IO.FileStream(
+                strFileName.Value, System.IO.FileMode.Open,
+                System.IO.FileAccess.Read, fileShare,
+                1024 * 64, System.IO.FileOptions.RandomAccess))
+            {
+                fs.Seek(lOffsetBytes.Value, System.IO.SeekOrigin.Begin);
+
+                fs.Read(bBuffer, 0, iLengthBytes.Value);
+            }
+
+            return new SqlBytes(bBuffer);
+        }
+
         #region Non exported methods
         internal static void PushSingleRecordResult(object result, System.Data.SqlDbType sqlDBType)
         {
@@ -175,11 +226,11 @@ namespace ITPCfSQL.Azure.CLR
                     record = new SqlDataRecord(new SqlMetaData[] { new SqlMetaData("Result", sqlDBType) });
 
                     SqlXml xml;
-                    using(System.Xml.XmlReader reader = System.Xml.XmlReader.Create(new System.IO.StringReader(result.ToString())))
+                    using (System.Xml.XmlReader reader = System.Xml.XmlReader.Create(new System.IO.StringReader(result.ToString())))
                     {
                         xml = new SqlXml(reader);
                     }
-                    
+
                     record.SetSqlXml(0, xml);
                     break;
                 case System.Data.SqlDbType.Int:

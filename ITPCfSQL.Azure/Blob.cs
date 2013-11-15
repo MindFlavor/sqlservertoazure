@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Xml;
-using System.Threading.Tasks;
 
 namespace ITPCfSQL.Azure
 {
@@ -231,9 +229,10 @@ namespace ITPCfSQL.Azure
                leaseId, snapshotDateTime, timeoutSeconds, xmsclientrequestId);
 
             Metadata.Clear();
-            foreach (KeyValuePair<string, string> kvp in dRet.Where(item => item.Key.StartsWith(METADATA_PREFIX)))
+            foreach (KeyValuePair<string, string> kvp in dRet) 
             {
-                Metadata[kvp.Key.Substring(METADATA_PREFIX.Length)] = kvp.Value;
+                if (kvp.Key.StartsWith(METADATA_PREFIX))
+                    Metadata[kvp.Key.Substring(METADATA_PREFIX.Length)] = kvp.Value;
             }
         }
 
