@@ -32,6 +32,15 @@ namespace ITPCfSQL.Azure.Internal
             req.Headers.Add("Authorization", AuthorizationHeader);
         }
 
+        public static string SignTheStringToSign(string stringToSign, string sharedKey)
+        {
+            byte[] SignatureBytes = System.Text.Encoding.UTF8.GetBytes(stringToSign);
+            System.Security.Cryptography.HMACSHA256 SHA256 = new System.Security.Cryptography.HMACSHA256(Convert.FromBase64String(sharedKey));
+
+            return Convert.ToBase64String(SHA256.ComputeHash(SignatureBytes));
+        }
+
+
         public static string GenerateAzureSignatureFromSharedKey(System.Net.HttpWebRequest req, string sharedKey)
         {
             StringBuilder sb = new StringBuilder();
@@ -130,12 +139,14 @@ namespace ITPCfSQL.Azure.Internal
             string signature = sb.ToString();
             //System.Diagnostics.Trace.TraceInformation("GenerateAzureSignatureFromSharedKey: Generated signature: " + signature);
 
-            byte[] SignatureBytes = System.Text.Encoding.UTF8.GetBytes(signature);
-            System.Security.Cryptography.HMACSHA256 SHA256 = new System.Security.Cryptography.HMACSHA256(Convert.FromBase64String(sharedKey));
+            return SignTheStringToSign(signature, sharedKey);
 
-            string strHash2Base64 = Convert.ToBase64String(SHA256.ComputeHash(SignatureBytes));
-            //System.Diagnostics.Trace.TraceInformation("GenerateAzureSignatureFromSharedKey: Generated hash: " + strHash2Base64);
-            return strHash2Base64;
+            //byte[] SignatureBytes = System.Text.Encoding.UTF8.GetBytes(signature);
+            //System.Security.Cryptography.HMACSHA256 SHA256 = new System.Security.Cryptography.HMACSHA256(Convert.FromBase64String(sharedKey));
+
+            //string strHash2Base64 = Convert.ToBase64String(SHA256.ComputeHash(SignatureBytes));
+            ////System.Diagnostics.Trace.TraceInformation("GenerateAzureSignatureFromSharedKey: Generated hash: " + strHash2Base64);
+            //return strHash2Base64;
         }
 
 
@@ -235,6 +246,44 @@ namespace ITPCfSQL.Azure.Internal
 
             //System.Diagnostics.Trace.TraceInformation("GenerateCanonicalizedResource: Generated string: " + sb.ToString());
             return sb.ToString();//.Replace("%82", new string(new char[] { (char)0xEF, (char)0xBF, (char)0xBD }));
+        }
+
+        public static Uri GenerateSharedAccessSignatureURI(
+            Uri ResourceURI,
+            string azureStorageSharedKey,
+            string Permissions,
+            string Resource,
+            DateTime ValidityStart,
+            DateTime ValidityExpiry,
+            string Identifier = null,
+            string Version = "2012-02-12")
+        {
+            StringBuilder sb = new StringBuilder(ResourceURI.AbsoluteUri);
+
+            string signedstart = ValidityStart.ToUniversalTime().ToString("O");
+            string signedexpiry = ValidityExpiry.ToUniversalTime().ToString("O");
+
+            sb.Append("?sv=" + Version);
+            sb.Append("&st=" + signedstart);
+            sb.Append("&se=" + signedexpiry);
+            sb.Append("&sr=" + Resource);
+            sb.Append("&sp=" + Permissions);
+
+            string canonicalizedresource = Signature.GenerateCanonicalizedResource(ResourceURI);
+
+            // calculate signature!
+            string StringToSign =
+                   Permissions + "\n" +
+                   signedstart + "\n" +
+                   signedexpiry + "\n" +
+                   canonicalizedresource + "\n" +
+                   Identifier + "\n" +
+                   Version;
+
+            string signature = Signature.SignTheStringToSign(StringToSign, azureStorageSharedKey);
+
+            sb.Append("&sig=" + signature);
+            return new Uri(sb.ToString());
         }
     }
 }
