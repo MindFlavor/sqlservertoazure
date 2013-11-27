@@ -119,15 +119,15 @@ namespace ITPCfSQL.Azure.Internal
                 throw new Exceptions.UnexpectedResponseTypeCodeException(System.Net.HttpStatusCode.Accepted, response.StatusCode);
         }
 
-        public static XmlDocument GetOperationStatus(
+        public static ITPCfSQL.Azure.Management.Operation GetOperationStatus(
              System.Security.Cryptography.X509Certificates.X509Certificate2 certificate,
-             Guid subscriptionId, string operationId)
+             Guid subscriptionId, Guid gOperationId)
         {
             Uri uri = new Uri(
                 GetManagementURI() + "/" +
                 subscriptionId.ToString() + "/" +
                 "operations" + "/" +
-                operationId);
+                gOperationId.ToString());
 
             System.Net.HttpWebRequest Request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(uri);
             Request.Method = "GET";
@@ -137,10 +137,10 @@ namespace ITPCfSQL.Azure.Internal
             System.Net.HttpWebResponse response = (System.Net.HttpWebResponse)Request.GetResponse();
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                System.Xml.XmlDocument doc = new XmlDocument();
-                doc.Load(response.GetResponseStream());
+                System.Xml.Serialization.XmlSerializer ser = new System.Xml.Serialization.XmlSerializer(
+                    typeof(ITPCfSQL.Azure.Management.Operation));
 
-                return doc;
+                return (ITPCfSQL.Azure.Management.Operation)ser.Deserialize(response.GetResponseStream());
             }
             else
                 throw new Exceptions.UnexpectedResponseTypeCodeException(System.Net.HttpStatusCode.OK, response.StatusCode);

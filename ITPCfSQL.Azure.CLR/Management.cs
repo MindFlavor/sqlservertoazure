@@ -11,7 +11,7 @@ namespace ITPCfSQL.Azure.CLR
     public class Management
     {
         #region Common methods
-        internal static X509Certificate2 RetrieveCertificateInStore(string certificateThumbprint)
+        public static X509Certificate2 RetrieveCertificateInStore(string certificateThumbprint)
         {
             X509Store certStore = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             certStore.Open(OpenFlags.ReadOnly);
@@ -124,7 +124,8 @@ namespace ITPCfSQL.Azure.CLR
             SqlBoolean EnableDirectServerReturn,
             SqlInt32 Port,
             SqlString Protocol,
-            SqlString Vip)
+            SqlString Vip,
+            SqlBoolean fBlocking)
         {
             X509Certificate2 certificate = RetrieveCertificateInStore(certificateThumbprint.Value);
             Azure.Management.Deployment result = Azure.Internal.Management.GetDeployments(
@@ -163,6 +164,12 @@ namespace ITPCfSQL.Azure.CLR
                 serviceName.Value,
                 result.Name,
                 vmToAdd);
+
+            PushOperationStatus(
+                certificate,
+                sgSubscriptionId.Value,
+                new Guid(output[ITPCfSQL.Azure.Internal.Constants.HEADER_REQUEST_ID]),
+                fBlocking.IsNull ? false : fBlocking.Value);
         }
 
         [SqlProcedure]
@@ -172,7 +179,8 @@ namespace ITPCfSQL.Azure.CLR
             SqlString serviceName,
             SqlString deploymentSlots,
             SqlString vmName,
-            SqlString EndpointName)
+            SqlString EndpointName,
+            SqlBoolean fBlocking)
         {
             X509Certificate2 certificate = RetrieveCertificateInStore(certificateThumbprint.Value);
             Azure.Management.Deployment result = Azure.Internal.Management.GetDeployments(
@@ -188,7 +196,7 @@ namespace ITPCfSQL.Azure.CLR
                     sgSubscriptionId.Value + ", serviceName = " + serviceName.Value + ", deploymentSlots = "
                     + deploymentSlots.Value + ".");
 
-            // Remove the SQL-1433 endpoint
+            // Remove the endpoint
             ITPCfSQL.Azure.Management.DeploymentRoleConfigurationSetsConfigurationSetInputEndpoint[] driiesTemp = new
             ITPCfSQL.Azure.Management.DeploymentRoleConfigurationSetsConfigurationSetInputEndpoint[vmToAdd.ConfigurationSets.ConfigurationSet.InputEndpoints.Length - 1];
             int iTemp = 0;
@@ -206,7 +214,67 @@ namespace ITPCfSQL.Azure.CLR
                 serviceName.Value,
                 result.Name,
                 vmToAdd);
+
+            PushOperationStatus(
+                certificate,
+                sgSubscriptionId.Value,
+                new Guid(output[ITPCfSQL.Azure.Internal.Constants.HEADER_REQUEST_ID]),
+                fBlocking.IsNull ? false : fBlocking.Value);
         }
+
+        [SqlFunction(
+                DataAccess = DataAccessKind.None,
+                SystemDataAccess = SystemDataAccessKind.None,
+                IsDeterministic = false,
+                IsPrecise = true)]
+        public static SqlString GetOperationStatus(
+            SqlString certificateThumbprint,
+            SqlGuid sgSubscriptionId,
+            SqlGuid sgOperationId)
+        {
+            X509Certificate2 certificate = RetrieveCertificateInStore(certificateThumbprint.Value);
+            return ITPCfSQL.Azure.Internal.Management.GetOperationStatus(certificate, sgSubscriptionId.Value, sgOperationId.Value).Status;
+        }
+
+        #region Support methods
+        private static void PushOperationStatus
+            (X509Certificate2 cert,
+            Guid gSubscriptionId,
+            Guid gOperationId,
+            bool fBlocking,
+            int iSleepMS = 1000)
+        {
+            Azure.Management.Operation op = ITPCfSQL.Azure.Internal.Management.GetOperationStatus(cert, gSubscriptionId, gOperationId);
+
+            if (fBlocking)
+            {
+                while (op.Status == "InProgress")
+                {
+                    System.Threading.Thread.Sleep(iSleepMS);
+                    op = ITPCfSQL.Azure.Internal.Management.GetOperationStatus(cert, gSubscriptionId, gOperationId);
+                }
+            }
+
+            PushOperationStatus(op);
+        }
+
+        private static void PushOperationStatus
+             (Azure.Management.Operation op)
+        {
+            SqlDataRecord sdr = new SqlDataRecord(
+                new SqlMetaData[] 
+                {
+                    new SqlMetaData("OperationId", System.Data.SqlDbType.NVarChar, 255),
+                    new SqlMetaData("Status", System.Data.SqlDbType.NVarChar, 255)
+                });
+
+            SqlContext.Pipe.SendResultsStart(sdr);
+            sdr.SetString(0, op.ID);
+            sdr.SetString(1, op.Status);
+            SqlContext.Pipe.SendResultsRow(sdr);
+            SqlContext.Pipe.SendResultsEnd();
+        }
+        #endregion
 
         #region Callbacks
         public static void _GetServicesCallback(

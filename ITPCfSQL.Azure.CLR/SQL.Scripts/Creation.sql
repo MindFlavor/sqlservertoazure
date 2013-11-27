@@ -928,3 +928,40 @@ RETURNS TABLE(
 ) 
 AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Management].GetDeploymentsPersistentVMRolesWithInputEndpoints;
 GO
+
+CREATE PROCEDURE [Azure.Management].AddInputEndpointToPersistentVM(
+	@certificateThumbprint		NVARCHAR(255), 
+	@subscriptionId				UNIQUEIDENTIFIER,
+	@serviceName				NVARCHAR(255),
+    @deploymentSlots			NVARCHAR(255),
+	@vmName						NVARCHAR(255),
+    @EndpointName				NVARCHAR(255),
+    @LocalPort					INT,
+    @EnableDirectServerReturn	BIT,
+    @Port						INT,
+    @Protocol					NVARCHAR(255),
+    @Vip						NVARCHAR(255),
+	@Blocking					BIT					= 0
+)
+AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Management].AddInputEndpointToPersistentVM;
+GO
+
+CREATE PROCEDURE [Azure.Management].RemoveEndpointFromPersistentVM(
+	@certificateThumbprint		NVARCHAR(255), 
+	@subscriptionId				UNIQUEIDENTIFIER,
+	@serviceName				NVARCHAR(255),
+    @deploymentSlots			NVARCHAR(255),
+	@vmName						NVARCHAR(255),
+    @EndpointName				NVARCHAR(255),
+	@Blocking					BIT					= 0
+)
+AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Management].RemoveEndpointFromPersistentVM;
+GO
+
+CREATE FUNCTION [Azure.Management].GetOperationStatus (
+	@certificateThumbprint		NVARCHAR(255), 
+	@subscriptionId				UNIQUEIDENTIFIER,
+	@operationId				UNIQUEIDENTIFIER
+)
+RETURNS NVARCHAR(255) EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Management].GetOperationStatus;
+GO

@@ -9,5 +9,6 @@ namespace ITPCfSQL.Azure.Internal
     public abstract class Constants
     {
         public const string HEADER_VERSION = "x-ms-version";
+        public const string HEADER_REQUEST_ID = "x-ms-request-id";
     }
 }
