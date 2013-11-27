@@ -61,3 +61,10 @@ EXEC [Azure].DeleteContainer
 	1,
 	'testcontainer'
 GO
+
+SELECT [Azure].GenerateBlobSharedAccessSignatureURI(
+	'http://<Azure Account Name, nvarchar(4000), AzureAccountName>.blob.core.windows.net/testcontainer?restype=container&comp=list',
+	'<Azure Shared Access Key, nvarchar(4000), [paste your key here]>',
+	'rwdl', 'c', 
+	CONVERT(DATETIME, '2013-11-1'), CONVERT(DATETIME, '2015-12-1'),
+	NULL);

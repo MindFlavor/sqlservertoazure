@@ -25,6 +25,8 @@ CREATE SCHEMA [Azure];
 GO
 CREATE SCHEMA [Azure.Embedded];
 GO
+CREATE SCHEMA [Azure.Management];
+GO
 
 CREATE ASSEMBLY [ITPCfSQL.Azure.CLR] FROM 'C:\GIT\itpcfsqlrepo\Projects\SQLServerToAzure\ITPCfSQL.Azure.CLR\bin\Debug\ITPCfSQL.Azure.CLR.dll'
 	--'C:\GIT\itpcfsqlrepo\Projects\ITPCfSQL.Azure\ITPCfSQL.Azure.CLR\bin\Debug\ITPCfSQL.Azure.CLR.dll'
@@ -861,4 +863,68 @@ CREATE PROCEDURE [Azure.Embedded].BreakContainerLeaseImmediately(
 	@timeoutSeconds INT = 0,
 	@xmsclientrequestId UNIQUEIDENTIFIER = NULL)
 AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.BlobStorage].BreakContainerLeaseImmediately_Embedded;
+GO
+
+CREATE FUNCTION [Azure].GetContainerFromUri(
+	@resourceUri NVARCHAR(4000))
+RETURNS NVARCHAR(255) EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Utils].GetContainerFromUri;
+GO
+
+CREATE FUNCTION [Azure].GenerateBlobSharedAccessSignatureURI(
+	@resourceUri NVARCHAR(4000),
+	@sharedKey NVARCHAR(4000),
+    @permissions NVARCHAR(8),
+	@resourceType NVARCHAR(4),
+	@validityStart DATETIME, 
+	@validityEnd DATETIME,
+    @identifier NVARCHAR(4000))
+RETURNS NVARCHAR(255) EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Utils].GenerateBlobSharedAccessSignatureURI;
+GO
+
+------------------
+--- Management ---
+------------------
+CREATE FUNCTION [Azure.Management].GetServices(
+	@certificateThumbprint NVARCHAR(255), 
+	@subscriptionId UNIQUEIDENTIFIER) 
+RETURNS TABLE(
+	ServiceName							NVARCHAR(4000),
+	Url									NVARCHAR(4000),
+	DefaultWinRmCertificateThumbprint	NVARCHAR(255),
+	AffinityGroup						NVARCHAR(4000),
+	DateCreated							DATETIME,
+	DateLastModified					DATETIME,
+	[Description]						NVARCHAR(MAX),
+	Label								NVARCHAR(4000),
+	Location							NVARCHAR(4000),
+	[Status]							NVARCHAR(255)
+) 
+AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Management].GetServices;
+GO
+
+CREATE FUNCTION [Azure.Management].GetDeploymentsPersistentVMRolesWithInputEndpoints(
+	@certificateThumbprint NVARCHAR(255), 
+	@subscriptionId UNIQUEIDENTIFIER,
+	@serviceName NVARCHAR(255),
+    @deploymentSlots NVARCHAR(255)) 
+RETURNS TABLE(
+	Name								NVARCHAR(4000),
+	DeploymentSlot						NVARCHAR(255),
+	PrivateID							NVARCHAR(255),
+	[Status]							NVARCHAR(255),
+	Label								NVARCHAR(4000),
+	Url									NVARCHAR(4000),
+	Configuration						NVARCHAR(MAX),
+	UpgradeDomainCount					INT,
+	VMName								NVARCHAR(4000),
+	OsVersion							NVARCHAR(4000),
+	RoleSize							NVARCHAR(255),
+	DefaultWinRmCertificateThumbprint	NVARCHAR(4000),
+	EndpointName						NVARCHAR(4000),
+	LocalPort							INT,
+	Port								INT,
+	Protocol							NVARCHAR(255),
+	Vip									NVARCHAR(255)
+) 
+AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Management].GetDeploymentsPersistentVMRolesWithInputEndpoints;
 GO

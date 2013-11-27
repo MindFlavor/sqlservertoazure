@@ -183,7 +183,7 @@ namespace ITPCfSQL.Azure.CLR
                 for (int i = 0; i < fss.Length; i++)
                 {
                     sb.Append(fss[i].ToString());
-                    if((i+1)<fss.Length)
+                    if ((i + 1) < fss.Length)
                         sb.Append(", ");
                 }
 
@@ -245,6 +245,47 @@ namespace ITPCfSQL.Azure.CLR
             SqlContext.Pipe.SendResultsEnd();
         }
         #endregion
+
+        #region Shared access signature
+        [SqlFunction
+            (IsDeterministic = true,
+            IsPrecise = true,
+            DataAccess = DataAccessKind.None,
+            SystemDataAccess = SystemDataAccessKind.None)]
+        public static SqlString GenerateBlobSharedAccessSignatureURI(
+            SqlString resourceUri, SqlString sharedKey,
+            SqlString permissions, SqlString resourceType,
+            SqlDateTime validityStart, SqlDateTime validityEnd,
+           SqlString identifier)
+        {
+            return ITPCfSQL.Azure.Internal.Signature.GenerateSharedAccessSignatureURI(
+                new Uri(resourceUri.Value),
+                sharedKey.Value,
+
+                permissions.IsNull ? null : permissions.Value,
+                resourceType.IsNull ? null : resourceType.Value,
+
+                validityStart.IsNull ? (DateTime?)null : validityStart.Value,
+                validityEnd.IsNull ? (DateTime?)null : validityEnd.Value,
+
+                null, null,
+
+                identifier.IsNull ? null : identifier.Value).AbsoluteUri;
+        }
+        #endregion
+
+        [SqlFunction
+            (IsDeterministic = true,
+            IsPrecise = true,
+            DataAccess = DataAccessKind.None,
+            SystemDataAccess = SystemDataAccessKind.None)]
+        public static SqlString GetContainerFromUri(
+            SqlString uri)
+        {
+            if (uri.IsNull)
+                return null;
+            return uri.Value.Split(new char[] { '/' })[3];
+        }
 
         #region Blog methods
         [SqlFunction

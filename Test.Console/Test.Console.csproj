@@ -48,6 +48,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ITPCfSQL.Azure.CLR\ITPCfSQL.Azure.CLR.csproj">
+      <Project>{be83aa9a-8b39-4c6b-bb4a-cb4b9d82a8e9}</Project>
+      <Name>ITPCfSQL.Azure.CLR</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ITPCfSQL.Azure\ITPCfSQL.Azure.csproj">
       <Project>{1b74a3bb-050e-4996-baf5-fc9883d75350}</Project>
       <Name>ITPCfSQL.Azure</Name>

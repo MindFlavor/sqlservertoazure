@@ -67,6 +67,10 @@
     <Compile Include="Enumerations\PutPageOperation.cs" />
     <Compile Include="Exceptions\AzureException.cs" />
     <Compile Include="Exceptions\UnexpectedResponseTypeCodeException.cs" />
+    <Compile Include="Internal\Constants.cs" />
+    <Compile Include="Internal\Management.cs" />
+    <Compile Include="Management\Deployment.cs" />
+    <Compile Include="Management\Services.cs" />
     <Compile Include="Responses\CopyBlobResponse.cs" />
     <Compile Include="Internal\InternalMethods.cs" />
     <Compile Include="Message.cs" />
@@ -85,6 +89,7 @@
   <ItemGroup>
     <None Include="tempKey.snk" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

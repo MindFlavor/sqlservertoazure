@@ -17,7 +17,7 @@ namespace ITPCfSQL.Azure.Internal
         public static void AddAzureAuthorizationHeaderLiteFromSharedKey(System.Net.HttpWebRequest req, string sharedKey)
         {
             string StringToSign = req.Headers["x-ms-date"] + "\n";
-            StringToSign += GenerateCanonicalizedResource(req.RequestUri); 
+            StringToSign += GenerateCanonicalizedResource(req.RequestUri);
 
             string signature = StringToSign;
             //System.Diagnostics.Trace.TraceInformation("GenerateAzureSignatureFromSharedKey: Generated signature: " + StringToSign);
@@ -183,6 +183,11 @@ namespace ITPCfSQL.Azure.Internal
                 return uri.Host.Substring(0, idx);
         }
 
+        public static string GenerateCanonicalizedResource(string uri)
+        {
+            return GenerateCanonicalizedResource(new Uri(uri));
+        }
+
         public static string GenerateCanonicalizedResource(Uri uri)
         {
             StringBuilder sb = new StringBuilder("/");
@@ -253,23 +258,65 @@ namespace ITPCfSQL.Azure.Internal
             string azureStorageSharedKey,
             string Permissions,
             string Resource,
-            DateTime ValidityStart,
-            DateTime ValidityExpiry,
+            DateTime? ValidityStart,
+            DateTime? ValidityExpiry,
+            string startPK,
+            string endPK,
             string Identifier = null,
             string Version = "2012-02-12")
         {
             StringBuilder sb = new StringBuilder(ResourceURI.AbsoluteUri);
 
-            string signedstart = ValidityStart.ToUniversalTime().ToString("O");
-            string signedexpiry = ValidityExpiry.ToUniversalTime().ToString("O");
+            string signedstart = null;
+            string signedexpiry = null;
 
-            sb.Append("?sv=" + Version);
-            sb.Append("&st=" + signedstart);
-            sb.Append("&se=" + signedexpiry);
+            if (ValidityStart.HasValue)
+                signedstart = ValidityStart.Value.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ");
+            if (ValidityExpiry.HasValue)
+                signedexpiry = ValidityExpiry.Value.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ");// ("O"); 
+
+            string strPathWithoutParams = ResourceURI.AbsoluteUri;
+            char fChar = '?';
+            if (ResourceURI.PathAndQuery.Contains('?'))
+            {
+                fChar = '&';
+                strPathWithoutParams = strPathWithoutParams.Substring(0, strPathWithoutParams.IndexOf('?'));
+            }
+
+            #region If container, make sure to strip off the potential blob and replace container with $root...
+            if (Resource == "c")
+            {
+                int iSkip = "https://".Length;
+                if (strPathWithoutParams.StartsWith("http://"))
+                    iSkip = "http://".Length;
+
+                int idx0 = strPathWithoutParams.IndexOf('/', iSkip);
+                int idx1 = strPathWithoutParams.IndexOf('/', idx0 + 1);
+                if (idx1 != -1)
+                    strPathWithoutParams = strPathWithoutParams.Substring(0, idx1);// +"/$root";
+            }
+            #endregion
+
+            sb.Append(fChar + "sv=" + Version);
+            if (!string.IsNullOrEmpty(signedstart))
+                sb.Append("&st=" + signedstart);
+            if (!string.IsNullOrEmpty(signedexpiry))
+                sb.Append("&se=" + signedexpiry);
+            
             sb.Append("&sr=" + Resource);
-            sb.Append("&sp=" + Permissions);
+            
+            if (!string.IsNullOrEmpty(Permissions))
+                sb.Append("&sp=" + Permissions);
 
-            string canonicalizedresource = Signature.GenerateCanonicalizedResource(ResourceURI);
+            if (!string.IsNullOrEmpty(startPK))
+                sb.Append("&spk=" + startPK);
+            if (!string.IsNullOrEmpty(endPK))
+                sb.Append("&epk=" + endPK);
+
+            if (!string.IsNullOrEmpty(Identifier))
+                sb.Append("&si=" + Identifier);
+
+            string canonicalizedresource = Signature.GenerateCanonicalizedResource(strPathWithoutParams);
 
             // calculate signature!
             string StringToSign =
@@ -281,6 +328,7 @@ namespace ITPCfSQL.Azure.Internal
                    Version;
 
             string signature = Signature.SignTheStringToSign(StringToSign, azureStorageSharedKey);
+            signature = Uri.EscapeDataString(signature);
 
             sb.Append("&sig=" + signature);
             return new Uri(sb.ToString());
