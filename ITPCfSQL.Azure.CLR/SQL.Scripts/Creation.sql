@@ -6,8 +6,8 @@
 USE [master];
 GO
 
-CREATE ASYMMETRIC KEY [AzureKey] FROM EXECUTABLE FILE = 'C:\GIT\itpcfsqlrepo\Projects\SQLServerToAzure\ITPCfSQL.Azure.CLR\bin\Debug\ITPCfSQL.Azure.CLR.dll'
-	--'C:\GIT\itpcfsqlrepo\Projects\SQLServerToAzure\ITPCfSQL.Azure.CLR\bin\Debug\ITPCfSQL.Azure.CLR.dll';
+CREATE ASYMMETRIC KEY [AzureKey] FROM EXECUTABLE FILE = '<ITPCfSQL.Azure.CLR.dll path, nvarchar(4000), DLLPath>'
+
 CREATE LOGIN [AzureLogin] FROM ASYMMETRIC KEY [AzureKey];
 
 GRANT EXTERNAL ACCESS ASSEMBLY TO [AzureLogin];
@@ -28,8 +28,8 @@ GO
 CREATE SCHEMA [Azure.Management];
 GO
 
-CREATE ASSEMBLY [ITPCfSQL.Azure.CLR] FROM 'C:\GIT\itpcfsqlrepo\Projects\SQLServerToAzure\ITPCfSQL.Azure.CLR\bin\Debug\ITPCfSQL.Azure.CLR.dll'
-	--'C:\GIT\itpcfsqlrepo\Projects\ITPCfSQL.Azure\ITPCfSQL.Azure.CLR\bin\Debug\ITPCfSQL.Azure.CLR.dll'
+CREATE ASSEMBLY [ITPCfSQL.Azure.CLR] FROM '<ITPCfSQL.Azure.CLR.dll path, nvarchar(4000), DLLPath>'
+
 WITH PERMISSION_SET=EXTERNAL_ACCESS;
 GO
 
