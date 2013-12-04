@@ -84,7 +84,6 @@
     <Compile Include="Responses\GetBlobPropertyResponse.cs" />
     <Compile Include="Responses\LeaseBlobResponse.cs" />
     <Compile Include="SharedAccessSignature\Signature.cs" />
-    <Compile Include="SharedAccessSignature\Temp.cs" />
     <Compile Include="Table.cs" />
     <Compile Include="TableEntity.cs" />
   </ItemGroup>

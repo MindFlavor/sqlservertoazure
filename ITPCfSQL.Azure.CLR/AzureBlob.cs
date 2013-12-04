@@ -27,6 +27,172 @@ namespace ITPCfSQL.Azure.CLR
                 xmsclientrequestId.IsNull ? (Guid?)null : xmsclientrequestId.Value);
         }
 
+        [SqlFunction(
+         DataAccess = DataAccessKind.None,
+         SystemDataAccess = SystemDataAccessKind.None,
+         FillRowMethodName = "_GetContainerACLCallback",
+         IsDeterministic = false,
+         IsPrecise = true,
+         TableDefinition = (@""))]
+        public static System.Collections.IEnumerable GetContainerACL(
+            SqlString accountName, SqlString sharedKey, SqlBoolean useHTTPS,
+            SqlString containerName,
+            SqlGuid leaseId,
+            SqlInt32 timeoutSeconds,
+            SqlGuid xmsclientrequestId)
+        {
+            AzureBlobService abs = new AzureBlobService(accountName.Value, sharedKey.Value, useHTTPS.Value);
+            Container cont = abs.GetContainer(containerName.Value);
+
+            Enumerations.ContainerPublicReadAccess cpr;
+            SharedAccessSignature.SharedAccessSignatureACL sasACL = cont.GetACL(out cpr,
+                leaseId.IsNull ? (Guid?)null : leaseId.Value,
+                timeoutSeconds.IsNull ? 0 : timeoutSeconds.Value,
+                xmsclientrequestId.IsNull ? (Guid?)null : xmsclientrequestId.Value);
+
+            List<CallbackSupport.SignedIdentifierWithContainerPublicReadAccess> lItems = new List<CallbackSupport.SignedIdentifierWithContainerPublicReadAccess>();
+            foreach (SharedAccessSignature.SignedIdentifier si in sasACL.SignedIdentifier)
+                lItems.Add(new CallbackSupport.SignedIdentifierWithContainerPublicReadAccess()
+                {
+                    SignedIdentifier = si,
+                    ContainerPublicReadAccess = cpr
+                });
+
+            if (lItems.Count == 0) // add empty to expose ContainerPublicReadAccess
+                lItems.Add(new CallbackSupport.SignedIdentifierWithContainerPublicReadAccess()
+                    {
+                        SignedIdentifier = null,
+                        ContainerPublicReadAccess = cpr
+                    });
+
+            return lItems;
+        }
+
+        [SqlProcedure]
+        public static void ChangeContainerPublicAccessMethod(
+            SqlString accountName, SqlString sharedKey, SqlBoolean useHTTPS,
+            SqlString containerName,
+            SqlString containerPublicReadAccess,            
+            SqlGuid LeaseId,
+            SqlInt32 timeoutSeconds,
+            SqlGuid xmsclientrequestId)
+        {
+            Enumerations.ContainerPublicReadAccess cpraNew;
+            if (!Enum.TryParse<Enumerations.ContainerPublicReadAccess>(containerPublicReadAccess.Value, out cpraNew))
+            {
+                StringBuilder sb = new StringBuilder("\"" + containerPublicReadAccess.Value + "\" is an invalid ContainerPublicReadAccess value. Valid values are: ");
+                foreach (string s in Enum.GetNames(typeof(Enumerations.ContainerPublicReadAccess)))
+                    sb.Append("\"" + s + "\" ");
+                throw new ArgumentException(sb.ToString());
+            }
+
+            AzureBlobService abs = new AzureBlobService(accountName.Value, sharedKey.Value, useHTTPS.Value);
+            Container cont = abs.GetContainer(containerName.Value);
+
+            Enumerations.ContainerPublicReadAccess cpra;
+            SharedAccessSignature.SharedAccessSignatureACL sasACL = cont.GetACL(out cpra,
+                LeaseId.IsNull ? (Guid?)null : LeaseId.Value,
+                timeoutSeconds.IsNull ? 0 : timeoutSeconds.Value,
+                xmsclientrequestId.IsNull ? (Guid?)null : xmsclientrequestId.Value);
+
+            cont.UpdateContainerACL(cpraNew, sasACL,
+                LeaseId.IsNull ? (Guid?)null : LeaseId.Value,
+                timeoutSeconds.IsNull ? 0 : timeoutSeconds.Value,
+                xmsclientrequestId.IsNull ? (Guid?)null : xmsclientrequestId.Value);
+        }
+
+        [SqlProcedure]
+        public static void AddContainerACL(
+            SqlString accountName, SqlString sharedKey, SqlBoolean useHTTPS,
+            SqlString containerName,
+            SqlString containerPublicReadAccess,
+            SqlString accessPolicyId,
+            SqlDateTime start, SqlDateTime expiry,
+            SqlBoolean canRead,
+            SqlBoolean canWrite,
+            SqlBoolean canDeleteBlobs,
+            SqlBoolean canListBlobs,
+            SqlGuid LeaseId,
+            SqlInt32 timeoutSeconds,
+            SqlGuid xmsclientrequestId)
+        {
+            Enumerations.ContainerPublicReadAccess cpraNew;
+            if(!Enum.TryParse<Enumerations.ContainerPublicReadAccess>(containerPublicReadAccess.Value, out cpraNew))
+            {
+                StringBuilder sb = new StringBuilder("\"" + containerPublicReadAccess.Value + "\" is an invalid ContainerPublicReadAccess value. Valid values are: ");
+                foreach (string s in Enum.GetNames(typeof(Enumerations.ContainerPublicReadAccess)))
+                    sb.Append("\"" + s + "\" ");
+                throw new ArgumentException(sb.ToString());
+            }
+
+            AzureBlobService abs = new AzureBlobService(accountName.Value, sharedKey.Value, useHTTPS.Value);
+            Container cont = abs.GetContainer(containerName.Value);
+
+            Enumerations.ContainerPublicReadAccess cpra;
+            SharedAccessSignature.SharedAccessSignatureACL sasACL = cont.GetACL(out cpra,
+                LeaseId.IsNull ? (Guid?)null : LeaseId.Value,
+                timeoutSeconds.IsNull ? 0 : timeoutSeconds.Value,
+                xmsclientrequestId.IsNull ? (Guid?)null : xmsclientrequestId.Value);
+
+            string strPermissions = "";
+            if (canRead.IsTrue)
+                strPermissions += "r";
+            if (canWrite.IsTrue)
+                strPermissions += "w";
+            if (canDeleteBlobs.IsTrue)
+                strPermissions += "d";
+            if (canListBlobs.IsTrue)
+                strPermissions += "l";
+
+            SharedAccessSignature.AccessPolicy ap = new SharedAccessSignature.AccessPolicy()
+            {
+                Start = start.Value,
+                Expiry = expiry.Value,
+                Permission = strPermissions
+            };
+
+            sasACL.SignedIdentifier.Add(new SharedAccessSignature.SignedIdentifier()
+                {
+                    AccessPolicy = ap,
+                    Id = accessPolicyId.Value
+                });
+
+            cont.UpdateContainerACL(cpraNew, sasACL,
+                LeaseId.IsNull ? (Guid?)null : LeaseId.Value,
+                timeoutSeconds.IsNull ? 0 : timeoutSeconds.Value,
+                xmsclientrequestId.IsNull ? (Guid?)null : xmsclientrequestId.Value);
+        }
+
+        [SqlProcedure]
+        public static void RemoveContainerACL(
+            SqlString accountName, SqlString sharedKey, SqlBoolean useHTTPS,
+            SqlString containerName,            
+            SqlString accessPolicyId,            
+            SqlGuid LeaseId,
+            SqlInt32 timeoutSeconds,
+            SqlGuid xmsclientrequestId)
+        {
+            AzureBlobService abs = new AzureBlobService(accountName.Value, sharedKey.Value, useHTTPS.Value);
+            Container cont = abs.GetContainer(containerName.Value);
+
+            Enumerations.ContainerPublicReadAccess cpra;
+            SharedAccessSignature.SharedAccessSignatureACL sasACL = cont.GetACL(out cpra,
+                LeaseId.IsNull ? (Guid?)null : LeaseId.Value,
+                timeoutSeconds.IsNull ? 0 : timeoutSeconds.Value,
+                xmsclientrequestId.IsNull ? (Guid?)null : xmsclientrequestId.Value);
+
+            int idx = sasACL.SignedIdentifier.FindIndex(item => item.Id == accessPolicyId.Value);
+            if (idx == -1)
+                throw new ArgumentException("No shared access policy with Id=" + accessPolicyId.Value + " found on container " + containerName.Value + ".");
+
+            sasACL.SignedIdentifier.RemoveAt(idx);
+
+            cont.UpdateContainerACL(cpra, sasACL,
+                LeaseId.IsNull ? (Guid?)null : LeaseId.Value,
+                timeoutSeconds.IsNull ? 0 : timeoutSeconds.Value,
+                xmsclientrequestId.IsNull ? (Guid?)null : xmsclientrequestId.Value);
+        }
+
         [SqlProcedure]
         public static void CreateContainer(
             SqlString accountName, SqlString sharedKey, SqlBoolean useHTTPS,
@@ -218,10 +384,10 @@ namespace ITPCfSQL.Azure.CLR
                 PutPage(
                     accountName, sharedKey, useHTTPS,
                     containerName, blobName,
-                    binaryBuffer, 
+                    binaryBuffer,
                     startPositionBytes, bytesToUpload,
-                    leaseId, 
-                    contentMD5, 
+                    leaseId,
+                    contentMD5,
                     timeoutSeconds,
                     xmsclientrequestId);
 
@@ -759,6 +925,35 @@ namespace ITPCfSQL.Azure.CLR
 
             leaseState = container.LeaseState.ToString();
             leaseStatus = container.LeaseStatus.ToString();
+        }
+
+        public static void _GetContainerACLCallback(
+            Object obj,
+            out SqlString Id,
+            out SqlDateTime Start,
+            out SqlDateTime Expiry,
+            out SqlString Permission,
+            out SqlString ContainerPublicReadAccess)
+        {
+            Id = SqlString.Null;
+            Start = SqlDateTime.Null;
+            Expiry = SqlDateTime.Null;
+            Permission = SqlString.Null;
+            ContainerPublicReadAccess = SqlString.Null;
+
+            if (!(obj is CallbackSupport.SignedIdentifierWithContainerPublicReadAccess))
+                throw new ArgumentException("Excpected type " + typeof(CallbackSupport.SignedIdentifierWithContainerPublicReadAccess).ToString() + ", received " + obj.GetType().ToString() + ".");
+
+            CallbackSupport.SignedIdentifierWithContainerPublicReadAccess siwcpra = (CallbackSupport.SignedIdentifierWithContainerPublicReadAccess)obj;
+
+            ContainerPublicReadAccess = siwcpra.ContainerPublicReadAccess.ToString();
+            if (siwcpra.SignedIdentifier != null)
+            {
+                Id = siwcpra.SignedIdentifier.Id;
+                Start = siwcpra.SignedIdentifier.AccessPolicy.Start;
+                Expiry = siwcpra.SignedIdentifier.AccessPolicy.Expiry;
+                Permission = siwcpra.SignedIdentifier.AccessPolicy.Permission;
+            }
         }
 
         public static void _ListBlobs(Object obj,

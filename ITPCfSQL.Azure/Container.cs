@@ -139,6 +139,35 @@ namespace ITPCfSQL.Azure
             };
         }
 
+        public SharedAccessSignature.SharedAccessSignatureACL GetACL
+            (
+            out ITPCfSQL.Azure.Enumerations.ContainerPublicReadAccess containerPublicAccess,
+            Guid? LeaseId = null,
+            int timeoutSeconds = 0,
+            Guid? xmsclientrequestId = null
+            )
+        {
+            return Internal.InternalMethods.GetContainerACL(
+                this.AzureBlobService.AccountName, this.AzureBlobService.SharedKey, this.AzureBlobService.UseHTTPS,
+                this.Name, out containerPublicAccess,
+                LeaseId, timeoutSeconds, xmsclientrequestId);            
+        }
+
+        public void UpdateContainerACL
+        (
+            ITPCfSQL.Azure.Enumerations.ContainerPublicReadAccess containerPublicAccess,
+            SharedAccessSignature.SharedAccessSignatureACL sasACL,
+            Guid? LeaseId = null,
+            int timeoutSeconds = 0,
+            Guid? xmsclientrequestId = null
+        )
+        {
+            Internal.InternalMethods.SetContainerACL(
+                this.AzureBlobService.AccountName, this.AzureBlobService.SharedKey, this.AzureBlobService.UseHTTPS,
+                this.Name, LeaseId, sasACL, containerPublicAccess,
+                timeoutSeconds, xmsclientrequestId);
+        }
+
         #region Static parsing methods
         public static Container ParseFromXMLNode(AzureBlobService abs, XmlNode node)
         {

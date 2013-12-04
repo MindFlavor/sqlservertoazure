@@ -8,7 +8,7 @@ namespace ITPCfSQL.Azure.SharedAccessSignature
 {
     /// <remarks/>
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = false, ElementName="SignedIdentifiers")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = false, ElementName = "SignedIdentifiers")]
     public partial class SharedAccessSignatureACL
     {
         [System.Xml.Serialization.XmlElementAttribute("SignedIdentifier")]
@@ -27,7 +27,7 @@ namespace ITPCfSQL.Azure.SharedAccessSignature
                 if (value.Length > 64)
                     throw new ArgumentException("SignedIdentifier Ids must be 64 chars or less.");
 
-                _id = value; 
+                _id = value;
             }
         }
 
@@ -49,7 +49,7 @@ namespace ITPCfSQL.Azure.SharedAccessSignature
             get { return Expiry.ToString("yyyy-MM-ddTHH:mm:ssZ"); }
             set { Expiry = DateTime.Parse(value); }
         }
-    
+
         [System.Xml.Serialization.XmlIgnore]
         public DateTime Start { get; set; }
 

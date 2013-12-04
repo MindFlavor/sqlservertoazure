@@ -261,15 +261,53 @@ namespace ITPCfSQL.Azure.CLR
             return ITPCfSQL.Azure.Internal.Signature.GenerateSharedAccessSignatureURI(
                 new Uri(resourceUri.Value),
                 sharedKey.Value,
-
                 permissions.IsNull ? null : permissions.Value,
                 resourceType.IsNull ? null : resourceType.Value,
-
                 validityStart.IsNull ? (DateTime?)null : validityStart.Value,
                 validityEnd.IsNull ? (DateTime?)null : validityEnd.Value,
-
                 null, null,
+                identifier.IsNull ? null : identifier.Value).AbsoluteUri;
+        }
 
+        [SqlFunction
+            (IsDeterministic = true,
+            IsPrecise = true,
+            DataAccess = DataAccessKind.None,
+            SystemDataAccess = SystemDataAccessKind.None)]
+        public static SqlString GenerateDirectBlobSharedAccessSignatureURI(
+            SqlString resourceUri, SqlString sharedKey,
+            SqlString permissions, SqlString resourceType,
+            SqlDateTime validityStart, SqlDateTime validityEnd)
+        {
+            return ITPCfSQL.Azure.Internal.Signature.GenerateSharedAccessSignatureURI(
+                new Uri(resourceUri.Value),
+                sharedKey.Value,
+                permissions.IsNull ? null : permissions.Value,
+                resourceType.IsNull ? null : resourceType.Value,
+                validityStart.IsNull ? (DateTime?)null : validityStart.Value,
+                validityEnd.IsNull ? (DateTime?)null : validityEnd.Value,
+                null, null,
+                null).AbsoluteUri;
+        }
+
+        [SqlFunction
+            (IsDeterministic = true,
+            IsPrecise = true,
+            DataAccess = DataAccessKind.None,
+            SystemDataAccess = SystemDataAccessKind.None)]
+        public static SqlString GeneratePolicyBlobSharedAccessSignatureURI(
+            SqlString resourceUri, SqlString sharedKey,
+            SqlString resourceType,            
+           SqlString identifier)
+        {
+            return ITPCfSQL.Azure.Internal.Signature.GenerateSharedAccessSignatureURI(
+                new Uri(resourceUri.Value),
+                sharedKey.Value,
+                null,
+                resourceType.IsNull ? null : resourceType.Value,
+                (DateTime?)null,
+                (DateTime?)null,
+                null, null,
                 identifier.IsNull ? null : identifier.Value).AbsoluteUri;
         }
         #endregion

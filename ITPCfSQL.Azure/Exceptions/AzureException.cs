@@ -5,6 +5,7 @@ using System.Text;
 
 namespace ITPCfSQL.Azure.Exceptions
 {
+    [Serializable]
     public class AzureException :Exception
     {
         public AzureException() { }

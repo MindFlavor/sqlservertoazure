@@ -21,7 +21,7 @@ namespace Test.Console
             string contName = "testsas";
 
             SharedAccessSignatureACL queueACL = new SharedAccessSignatureACL();
-            queueACL.SignedIdentifier = new List<SignedIdentifier>();// new SignedIdentifier[2];
+            queueACL.SignedIdentifier = new List<SignedIdentifier>();
 
             queueACL.SignedIdentifier.Add(new SignedIdentifier()
             {

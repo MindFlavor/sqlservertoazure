@@ -631,7 +631,7 @@ namespace ITPCfSQL.Azure.Internal
 
             strUrl += "?popreceipt=" + popreceipt;
             if (timeoutSeconds > 0)
-                strUrl += string.Format("&timeout={1:S}", timeoutSeconds.ToString());
+                strUrl += string.Format("&timeout={0:S}", timeoutSeconds.ToString());
             strUrl += string.Format("&visibilitytimeout={0:S}", visibilitytimeoutSeconds.ToString());
 
             System.Net.HttpWebRequest Request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(strUrl);
@@ -1234,7 +1234,7 @@ namespace ITPCfSQL.Azure.Internal
                 out ContainerPublicReadAccess containerPublicAccess,
                 Guid? leaseID = null,
                 int timeoutSeconds = 0,
-                string xmsclientrequestId = null
+                Guid? xmsclientrequestId = null
             )
         {
             containerPublicAccess = ContainerPublicReadAccess.Off;
@@ -1252,8 +1252,8 @@ namespace ITPCfSQL.Azure.Internal
 
             Request.Headers.Add("x-ms-date", strDate);
             Request.Headers.Add("x-ms-version", "2013-08-15");
-            if (!string.IsNullOrEmpty(xmsclientrequestId))
-                Request.Headers.Add("x-ms-client-request-id", xmsclientrequestId);
+            if (xmsclientrequestId.HasValue && xmsclientrequestId.Value != Guid.Empty)
+                Request.Headers.Add("x-ms-client-request-id", xmsclientrequestId.Value.ToString());
             if ((leaseID.HasValue) && (leaseID.Value != Guid.Empty))
             {
                 Request.Headers.Add("x-ms-lease-id", leaseID.ToString());
@@ -1308,7 +1308,7 @@ namespace ITPCfSQL.Azure.Internal
                 SharedAccessSignature.SharedAccessSignatureACL queueACL = null,
                 ContainerPublicReadAccess containerPublicAccess = ContainerPublicReadAccess.Off,
                 int timeoutSeconds = 0,
-                string xmsclientrequestId = null
+                Guid? xmsclientrequestId = null
             )
         {
             if (queueACL == null)
@@ -1326,8 +1326,8 @@ namespace ITPCfSQL.Azure.Internal
 
             Request.Headers.Add("x-ms-date", strDate);
             Request.Headers.Add("x-ms-version", "2013-08-15");
-            if (!string.IsNullOrEmpty(xmsclientrequestId))
-                Request.Headers.Add("x-ms-client-request-id", xmsclientrequestId);
+            if (xmsclientrequestId.HasValue && xmsclientrequestId.Value != Guid.Empty)
+                Request.Headers.Add("x-ms-client-request-id", xmsclientrequestId.Value.ToString());
             if ((leaseID.HasValue) && (leaseID.Value != Guid.Empty))
             {
                 Request.Headers.Add("x-ms-lease-id", leaseID.ToString());
