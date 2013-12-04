@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 using ITPCfSQL.Azure.Internal;
 using ITPCfSQL.Azure;
 using System.Web;
-using ITPCfSQL.Azure;
-
 using System.Security;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -18,6 +16,10 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
+            Test.Console.TestQueueACL.Do();
+
+            return;
+
             string certThumb = "xxxxx";
             Guid gSub = new Guid("00000000-d7cc-4454-9443-75ca862d34c1");
 

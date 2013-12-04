@@ -7,6 +7,6 @@ namespace ITPCfSQL.Azure.Enumerations
 {
     public enum ContainerPublicReadAccess
     {
-         Off, Container, Blob 
+         Off, Container, Blob, PublicPrior20090919
     };
 }
