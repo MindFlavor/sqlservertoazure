@@ -5,6 +5,7 @@ using System.Text;
 
 namespace ITPCfSQL.Azure.Exceptions
 {
+    [Serializable]
     public class UnexpectedResponseTypeCodeException:AzureException
     {
         public System.Net.HttpStatusCode ExpectedStatusCode;

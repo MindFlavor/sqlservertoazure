@@ -571,6 +571,10 @@ namespace ITPCfSQL.Azure.CLR
                 timeoutSeconds, xmsclientrequestId);
         }
         #endregion
+
+        #region Callbacks
+
+        #endregion
         #endregion
     }
 }

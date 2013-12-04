@@ -51,6 +51,59 @@ CREATE PROCEDURE Azure.DeleteContainer(@AccountName NVARCHAR(255), @SharedKey NV
 AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.AzureBlob].DeleteContainer;
 GO
 
+CREATE FUNCTION Azure.GetContainerACL(
+	@AccountName NVARCHAR(255), @SharedKey NVARCHAR(255), @useHTTPS bit,
+	@ContainerName NVARCHAR(255),
+	@LeaseId UNIQUEIDENTIFIER = NULL,
+	@TimeoutSeconds INT = 0,
+	@xmsclientrequestId UNIQUEIDENTIFIER = NULL)
+RETURNS TABLE
+	(
+		Id NVARCHAR(64),
+        Start DATETIME,
+        Expiry DATETIME,
+        Permission NVARCHAR(255),
+        ContainerPublicReadAccess NVARCHAR(255)) 
+AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.AzureBlob].GetContainerACL;
+GO
+
+CREATE PROCEDURE Azure.ChangeContainerPublicAccessMethod(
+	@AccountName NVARCHAR(255), @SharedKey NVARCHAR(255), @useHTTPS bit, 
+	@ContainerName NVARCHAR(4000), 
+	@ContainerPublicReadAccess NVARCHAR(255),
+    @LeaseId UNIQUEIDENTIFIER = NULL,
+    @timeoutSeconds INT = 0,
+	@xmsclientrequestId UNIQUEIDENTIFIER = NULL)
+AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.AzureBlob].ChangeContainerPublicAccessMethod;
+GO
+
+CREATE PROCEDURE Azure.AddContainerACL(
+	@AccountName NVARCHAR(255), @SharedKey NVARCHAR(255), @useHTTPS bit, 
+	@ContainerName NVARCHAR(4000), 
+	@ContainerPublicReadAccess NVARCHAR(255),
+	@accessPolicyId NVARCHAR(64),
+    @start DATETIME, 
+	@expiry DATETIME,
+    @canRead BIT = 0,
+    @canWrite BIT = 0,
+    @canDeleteBlobs BIT = 0,
+    @canListBlobs BIT = 0,
+    @LeaseId UNIQUEIDENTIFIER = NULL,
+    @timeoutSeconds INT = 0,
+	@xmsclientrequestId UNIQUEIDENTIFIER = NULL)
+AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.AzureBlob].AddContainerACL;
+GO
+
+CREATE PROCEDURE Azure.RemoveContainerACL(
+	@AccountName NVARCHAR(255), @SharedKey NVARCHAR(255), @useHTTPS bit, 
+	@ContainerName NVARCHAR(4000), 
+	@accessPolicyId NVARCHAR(64),
+    @LeaseId UNIQUEIDENTIFIER = NULL,
+    @timeoutSeconds INT = 0,
+	@xmsclientrequestId UNIQUEIDENTIFIER = NULL)
+AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.AzureBlob].RemoveContainerACL;
+GO
+
 CREATE FUNCTION Azure.ListBlobs(@AccountName NVARCHAR(255), @SharedKey NVARCHAR(255), @useHTTPS bit,
 	@container NVARCHAR(4000), 
 	@includeSnapshots BIT,
@@ -880,6 +933,25 @@ CREATE FUNCTION [Azure].GenerateBlobSharedAccessSignatureURI(
     @identifier NVARCHAR(4000))
 RETURNS NVARCHAR(255) EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Utils].GenerateBlobSharedAccessSignatureURI;
 GO
+
+CREATE FUNCTION [Azure].GenerateDirectBlobSharedAccessSignatureURI(
+	@resourceUri NVARCHAR(4000),
+	@sharedKey NVARCHAR(4000),
+    @permissions NVARCHAR(8),
+	@resourceType NVARCHAR(4),
+	@validityStart DATETIME, 
+	@validityEnd DATETIME)
+RETURNS NVARCHAR(255) EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Utils].GenerateDirectBlobSharedAccessSignatureURI;
+GO
+
+CREATE FUNCTION [Azure].GeneratePolicyBlobSharedAccessSignatureURI(
+	@resourceUri NVARCHAR(4000),
+	@sharedKey NVARCHAR(4000),
+	@resourceType NVARCHAR(4),
+    @identifier NVARCHAR(4000))
+RETURNS NVARCHAR(255) EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Utils].GeneratePolicyBlobSharedAccessSignatureURI;
+GO
+
 
 ------------------
 --- Management ---

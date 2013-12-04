@@ -51,6 +51,7 @@
     <Compile Include="CallbackSupport\DeploymentsPersistentVMRolesWithInputEndpoints.cs" />
     <Compile Include="BlobStorage.cs" />
     <Compile Include="AzureBlob.cs" />
+    <Compile Include="CallbackSupport\SignedIdentifierWithContainerPublicReadAccess.cs" />
     <Compile Include="Configuration\EmbeddedConfiguration.cs" />
     <Compile Include="Management.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

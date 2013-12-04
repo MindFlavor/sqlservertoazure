@@ -83,7 +83,7 @@
     <Compile Include="Responses\AzureResponseWithETag.cs" />
     <Compile Include="Responses\GetBlobPropertyResponse.cs" />
     <Compile Include="Responses\LeaseBlobResponse.cs" />
-    <Compile Include="SimpleDictTable.cs" />
+    <Compile Include="SharedAccessSignature\Signature.cs" />
     <Compile Include="Table.cs" />
     <Compile Include="TableEntity.cs" />
   </ItemGroup>

@@ -13,14 +13,3 @@ GO
 DROP ASYMMETRIC KEY AzureKey;
 GO
 
-
-DELETE FROM msdb.dbo.backupfilegroup
-WHERE backup_set_id IN (SELECT backup_set_id FROM msdb.dbo.backupset WHERE database_name = 'DemoAzureCLR');
-GO
-DELETE FROM msdb.dbo.backupfile
-WHERE backup_set_id IN (SELECT backup_set_id FROM msdb.dbo.backupset WHERE database_name = 'DemoAzureCLR');
-GO
-DELETE FROM msdb.dbo.backupset
-WHERE database_name = 'DemoAzureCLR';
-GO
-

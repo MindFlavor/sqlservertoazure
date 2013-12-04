@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ITPCfSQL.Azure.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -630,7 +631,7 @@ namespace ITPCfSQL.Azure.Internal
 
             strUrl += "?popreceipt=" + popreceipt;
             if (timeoutSeconds > 0)
-                strUrl += string.Format("&timeout={1:S}", timeoutSeconds.ToString());
+                strUrl += string.Format("&timeout={0:S}", timeoutSeconds.ToString());
             strUrl += string.Format("&visibilitytimeout={0:S}", visibilitytimeoutSeconds.ToString());
 
             System.Net.HttpWebRequest Request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(strUrl);
@@ -1125,7 +1126,7 @@ namespace ITPCfSQL.Azure.Internal
             string xmsclientrequestId = null
             )
         {
-           string strUrl = string.Format("{0:S}/{1:S}?restype=container", GetBlobStorageUrl(useHTTPS, accountName), containerName);
+            string strUrl = string.Format("{0:S}/{1:S}?restype=container", GetBlobStorageUrl(useHTTPS, accountName), containerName);
 
             if (timeoutSeconds > 0)
                 strUrl += string.Format("&timeout={0:S}", timeoutSeconds.ToString());
@@ -1220,6 +1221,161 @@ namespace ITPCfSQL.Azure.Internal
                 }
                 else
                     throw new Exceptions.UnexpectedResponseTypeCodeException(System.Net.HttpStatusCode.Accepted, response.StatusCode);
+            }
+        }
+
+
+        public static SharedAccessSignature.SharedAccessSignatureACL GetContainerACL
+            (
+                string accountName,
+                string sharedKey,
+                bool useHTTPS,
+                string containerName,
+                out ContainerPublicReadAccess containerPublicAccess,
+                Guid? leaseID = null,
+                int timeoutSeconds = 0,
+                Guid? xmsclientrequestId = null
+            )
+        {
+            containerPublicAccess = ContainerPublicReadAccess.Off;
+
+            string strUrl = string.Format("{0:S}/{1:S}?restype=container&comp=acl", GetBlobStorageUrl(useHTTPS, accountName), containerName);
+            if (timeoutSeconds > 0)
+                strUrl += string.Format("&timeout={0:S}", timeoutSeconds.ToString());
+
+            System.Net.HttpWebRequest Request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(strUrl);
+            Request.Method = "GET";
+            Request.ContentLength = 0;
+
+            #region Add HTTP headers
+            string strDate = DateTime.UtcNow.ToString("R");
+
+            Request.Headers.Add("x-ms-date", strDate);
+            Request.Headers.Add("x-ms-version", "2013-08-15");
+            if (xmsclientrequestId.HasValue && xmsclientrequestId.Value != Guid.Empty)
+                Request.Headers.Add("x-ms-client-request-id", xmsclientrequestId.Value.ToString());
+            if ((leaseID.HasValue) && (leaseID.Value != Guid.Empty))
+            {
+                Request.Headers.Add("x-ms-lease-id", leaseID.ToString());
+            }
+            #endregion
+
+            Signature.AddAzureAuthorizationHeaderFromSharedKey(Request, sharedKey);
+
+            using (System.Net.HttpWebResponse response = (System.Net.HttpWebResponse)Request.GetResponse())
+            {
+                System.Xml.Serialization.XmlSerializer ser = new System.Xml.Serialization.XmlSerializer(typeof(SharedAccessSignature.SharedAccessSignatureACL));
+
+                System.Xml.Serialization.XmlSerializerNamespaces namespaces = new System.Xml.Serialization.XmlSerializerNamespaces();
+                namespaces.Add(string.Empty, string.Empty);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {                    
+                    if(response.Headers.AllKeys.FirstOrDefault(item => item == "x-ms-blob-public-access") != null)
+                    {
+                        switch(response.Headers["x-ms-blob-public-access"])
+                        {
+                            case "container":
+                                containerPublicAccess = ContainerPublicReadAccess.Container;
+                                break;
+                            case "blob":
+                                containerPublicAccess = ContainerPublicReadAccess.Blob;
+                                break;
+                            case "true":
+                                containerPublicAccess = ContainerPublicReadAccess.PublicPrior20090919;
+                                break;
+                            default:
+                                throw new ArgumentException("Received unsupported value (" + response.Headers["x-ms-blob-public-access"] + ") as x-ms-blob-public-access header. What is that?");
+                        }
+                    }
+
+                    using (System.IO.Stream s = response.GetResponseStream())
+                    {
+                        return (SharedAccessSignature.SharedAccessSignatureACL)ser.Deserialize(s);
+                    }
+                }
+                else
+                    throw new Exceptions.UnexpectedResponseTypeCodeException(System.Net.HttpStatusCode.OK, response.StatusCode);
+            }
+        }
+
+        public static Dictionary<string, string> SetContainerACL(
+                string accountName,
+                string sharedKey,
+                bool useHTTPS,
+                string containerName,
+                Guid? leaseID = null,
+                SharedAccessSignature.SharedAccessSignatureACL queueACL = null,
+                ContainerPublicReadAccess containerPublicAccess = ContainerPublicReadAccess.Off,
+                int timeoutSeconds = 0,
+                Guid? xmsclientrequestId = null
+            )
+        {
+            if (queueACL == null)
+                queueACL = new SharedAccessSignature.SharedAccessSignatureACL();
+
+            string strUrl = string.Format("{0:S}/{1:S}?restype=container&comp=acl", GetBlobStorageUrl(useHTTPS, accountName), containerName);
+            if (timeoutSeconds > 0)
+                strUrl += string.Format("&timeout={0:S}", timeoutSeconds.ToString());
+
+            System.Net.HttpWebRequest Request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(strUrl);
+            Request.Method = "PUT";
+
+            #region Add HTTP headers
+            string strDate = DateTime.UtcNow.ToString("R");
+
+            Request.Headers.Add("x-ms-date", strDate);
+            Request.Headers.Add("x-ms-version", "2013-08-15");
+            if (xmsclientrequestId.HasValue && xmsclientrequestId.Value != Guid.Empty)
+                Request.Headers.Add("x-ms-client-request-id", xmsclientrequestId.Value.ToString());
+            if ((leaseID.HasValue) && (leaseID.Value != Guid.Empty))
+            {
+                Request.Headers.Add("x-ms-lease-id", leaseID.ToString());
+            }
+
+            switch (containerPublicAccess)
+            {
+                case ContainerPublicReadAccess.Blob:
+                    Request.Headers.Add("x-ms-blob-public-access", "blob");
+                    break;
+                case ContainerPublicReadAccess.Container:
+                    Request.Headers.Add("x-ms-blob-public-access", "container");
+                    break;
+                case ContainerPublicReadAccess.Off:
+                    //Don't add anything.
+                    break;
+                case ContainerPublicReadAccess.PublicPrior20090919:
+                    throw new ArgumentException(ContainerPublicReadAccess.PublicPrior20090919.ToString() + " is not supported in SetContainerACL. It's legacy!");
+            }
+            #endregion
+
+            #region Add content
+            System.Xml.Serialization.XmlSerializer ser = new System.Xml.Serialization.XmlSerializer(typeof(SharedAccessSignature.SharedAccessSignatureACL));
+
+            System.Xml.Serialization.XmlSerializerNamespaces namespaces = new System.Xml.Serialization.XmlSerializerNamespaces();
+            namespaces.Add(string.Empty, string.Empty);
+
+            using (System.IO.Stream s = Request.GetRequestStream())
+            {
+                ser.Serialize(s, queueACL, namespaces);
+            }
+            #endregion
+
+            Signature.AddAzureAuthorizationHeaderFromSharedKey(Request, sharedKey);
+
+            using (System.Net.HttpWebResponse response = (System.Net.HttpWebResponse)Request.GetResponse())
+            {
+                Dictionary<string, string> dHeaders = new Dictionary<string, string>();
+                foreach (string he in response.Headers)
+                {
+                    dHeaders.Add(he, response.Headers[he]);
+                }
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    return dHeaders;
+                }
+                else
+                    throw new Exceptions.UnexpectedResponseTypeCodeException(System.Net.HttpStatusCode.OK, response.StatusCode);
             }
         }
         #endregion
