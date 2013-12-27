@@ -809,6 +809,46 @@ namespace ITPCfSQL.Azure.Internal
             }
         }
 
+        public static void DeleteTable(
+            string accountName,
+            string sharedKey,
+            bool useHTTPS,
+            string tableName,
+            Guid? xmsclientrequestId = null)
+        {
+            string strUrl = string.Format("{0:S}/Tables('{1:S}')", GetTableUrl(useHTTPS, accountName), tableName);
+
+            System.Net.HttpWebRequest Request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(strUrl);
+            Request.Method = "DELETE";
+
+            #region Add HTTP headers
+            string strDate = DateTime.UtcNow.ToString("R");
+
+            Request.ContentLength = 0;
+            Request.Headers.Add("x-ms-date", strDate);
+            Request.Headers.Add("x-ms-version", "2012-02-12");
+            if ((xmsclientrequestId.HasValue) && (xmsclientrequestId.Value != Guid.Empty))
+                Request.Headers.Add("x-ms-client-request-id", xmsclientrequestId.ToString());
+
+            Request.Accept = "application/atom+xml,application/xml";
+            Request.ContentType = "application/atom+xml";
+            Request.Headers.Add("Accept-Charset", "UTF-8");
+            Request.UserAgent = "SQLToAzure";
+            Request.Headers.Add("DataServiceVersion", "1.0;NetFx");
+            Request.Headers.Add("MaxDataServiceVersion", "2.0;NetFx");
+            #endregion
+
+            Signature.AddAzureAuthorizationHeaderLiteFromSharedKey(Request, sharedKey);
+
+            using (System.Net.HttpWebResponse response = (System.Net.HttpWebResponse)Request.GetResponse())
+            {
+                if (response.StatusCode != System.Net.HttpStatusCode.NoContent)
+                {
+                    throw new Exceptions.UnexpectedResponseTypeCodeException(System.Net.HttpStatusCode.NoContent, response.StatusCode);
+                }
+            }
+        }
+
         public static string QueryTables(
             bool useHTTPS,
             string sharedKey,
@@ -1270,10 +1310,10 @@ namespace ITPCfSQL.Azure.Internal
                 namespaces.Add(string.Empty, string.Empty);
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
-                {                    
-                    if(response.Headers.AllKeys.FirstOrDefault(item => item == "x-ms-blob-public-access") != null)
+                {
+                    if (response.Headers.AllKeys.FirstOrDefault(item => item == "x-ms-blob-public-access") != null)
                     {
-                        switch(response.Headers["x-ms-blob-public-access"])
+                        switch (response.Headers["x-ms-blob-public-access"])
                         {
                             case "container":
                                 containerPublicAccess = ContainerPublicReadAccess.Container;

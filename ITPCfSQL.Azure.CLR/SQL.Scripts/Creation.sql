@@ -320,6 +320,10 @@ CREATE PROCEDURE Azure.CreateTable(@AccountName NVARCHAR(255), @SharedKey NVARCH
 AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Table].CreateTable;
 GO
 
+CREATE PROCEDURE Azure.DropTable(@AccountName NVARCHAR(255), @SharedKey NVARCHAR(255), @useHTTPS bit, @TableName NVARCHAR(4000), @xmsclientrequestId UNIQUEIDENTIFIER = NULL)
+AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Table].DropTable;
+GO
+
 CREATE FUNCTION Azure.ListTables(@AccountName NVARCHAR(255), @SharedKey NVARCHAR(255), @useHTTPS bit, @xmsclientrequestId NVARCHAR(4000) = NULL)
 RETURNS TABLE(Name NVARCHAR(4000), Url NVARCHAR(MAX)) 
 AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Table].ListTables;

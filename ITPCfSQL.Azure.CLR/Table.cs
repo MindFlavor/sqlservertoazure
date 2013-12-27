@@ -36,6 +36,17 @@ namespace ITPCfSQL.Azure.CLR
         }
 
         [SqlProcedure]
+        public static void DropTable(
+            SqlString accountName, SqlString sharedKey, SqlBoolean useHTTPS,
+            SqlString tableName,
+            SqlGuid xmsclientrequestId)
+        {
+            ITPCfSQL.Azure.AzureTableService ats = new AzureTableService(accountName.Value, sharedKey.Value, useHTTPS.Value);
+            ats.GetTable(tableName.Value).Drop(
+                xmsclientrequestId.IsNull ? (Guid?)null : xmsclientrequestId.Value);
+        }
+
+        [SqlProcedure]
         public static void InsertOrReplaceEntity(
             SqlString accountName, SqlString sharedKey, SqlBoolean useHTTPS,
             SqlString tableName,
@@ -57,8 +68,8 @@ namespace ITPCfSQL.Azure.CLR
                 te.Attributes[nAttrib.Name] = nAttrib.InnerText;
             }
 
-            table.InsertOrUpdate(te, 
-                xmsclientrequestId != null ? xmsclientrequestId.Value : null);         
+            table.InsertOrUpdate(te,
+                xmsclientrequestId != null ? xmsclientrequestId.Value : null);
         }
 
         [SqlProcedure]
@@ -164,10 +175,10 @@ namespace ITPCfSQL.Azure.CLR
             SqlString tableName,
             SqlString xmsclientrequestId)
         {
-             Configuration.EmbeddedConfiguration config = Configuration.EmbeddedConfiguration.GetConfigurationFromEmbeddedFile(logicalConnectionName.Value);
+            Configuration.EmbeddedConfiguration config = Configuration.EmbeddedConfiguration.GetConfigurationFromEmbeddedFile(logicalConnectionName.Value);
 
-             return QueryTable(config.AccountName, config.SharedKey, config.UseHTTPS,
-                 tableName, xmsclientrequestId);
+            return QueryTable(config.AccountName, config.SharedKey, config.UseHTTPS,
+                tableName, xmsclientrequestId);
         }
         #endregion
 

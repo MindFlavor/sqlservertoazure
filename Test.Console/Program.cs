@@ -16,14 +16,31 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            Test.Console.TestQueueACL.Do();
+            //Test.Console.TestQueueACL.Do();
 
-            return;
 
-            string certThumb = "xxxxx";
-            Guid gSub = new Guid("00000000-d7cc-4454-9443-75ca862d34c1");
+        ITPCfSQL.Azure.Internal.InternalMethods.DeleteTable(
+            "<<account>>", "<<shared key>>", true,
+            "HaOnAzure");
+
+          var res=  ITPCfSQL.Azure.CLR.Utils.GeneratePolicyBlobSharedAccessSignatureURI(
+                "https://frcognostorage01.blob.core.windows.net/demoacl",
+                "<shared key>>>",
+                "c",
+                "frcogno Demo ACL Policy");
+
+
+
+            //return;
+
+            string certThumb = "671C39F8967B4C10142B9F9393E80B85629551D6";
+            Guid gSub = new Guid("8e95e0bb-d7cc-4454-9443-75ca862d34c1");
 
             X509Certificate2 cert = ITPCfSQL.Azure.CLR.Management.RetrieveCertificateInStore(certThumb);
+
+            var svc = ITPCfSQL.Azure.Internal.Management.GetServices(cert, gSub);
+            
+            var depl = ITPCfSQL.Azure.Internal.Management.GetDeployments(cert, gSub, "igor2014ctp2");
 
             ITPCfSQL.Azure.CLR.Management.RemoveEndpointFromPersistentVM(
                certThumb,

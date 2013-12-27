@@ -39,6 +39,12 @@ namespace ITPCfSQL.Azure
                  AzureTableService.AccountName, AzureTableService.SharedKey, AzureTableService.UseHTTPS, this.Name, te, xmsclientrequestId);
         }
 
+        public void Drop(Guid? xmsclientrequestId = null)
+        {
+            ITPCfSQL.Azure.Internal.InternalMethods.DeleteTable(
+                 AzureTableService.AccountName, AzureTableService.SharedKey, AzureTableService.UseHTTPS, this.Name, xmsclientrequestId);
+        }
+
         public System.Collections.Generic.IEnumerable<TableEntity> Query(string xmsclientrequestId = null)
         {
             List<TableEntity> lEntities = new List<TableEntity>();
@@ -75,7 +81,7 @@ namespace ITPCfSQL.Azure
                 System.Xml.XmlNode nFollow = nTimeStamp.NextSibling;
                 while (nFollow != null)
                 {
-                    te.Attributes[nFollow.LocalName] = nFollow.InnerText;                    
+                    te.Attributes[nFollow.LocalName] = nFollow.InnerText;
                     nFollow = nFollow.NextSibling;
                 }
 
