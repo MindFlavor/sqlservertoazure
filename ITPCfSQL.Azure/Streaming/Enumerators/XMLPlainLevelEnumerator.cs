@@ -39,11 +39,12 @@ namespace ITPCfSQL.Azure.Streaming.Enumerators
             }
         }
 
-        ~XMLPlainLevelEnumerator()
-        {
-            if (reader != null)
-                reader.Dispose();
-        }
+        // Finalizers are not supported in SQL CLR
+        //~XMLPlainLevelEnumerator()
+        //{
+        //    if (reader != null)
+        //        reader.Dispose();
+        //}
         #endregion
 
         #region IEnumerator

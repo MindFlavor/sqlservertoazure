@@ -1,61 +1,122 @@
-﻿using System;
+﻿using Microsoft.SqlServer.Server;
+using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using ITPCfSQL.Azure.Streaming;
 
 namespace ITPCfSQL.Azure.CLR.Streaming
 {
-    public class Stream : System.Collections.IEnumerable
+    public class Stream
     {
-        public delegate void RowParsedDelegate(Dictionary<string, string> row);
-
-        public void ParseStream(System.IO.Stream s, int iLevelToFind, RowParsedDelegate rpd)
+        [SqlFunction(
+               DataAccess = DataAccessKind.None,
+               SystemDataAccess = SystemDataAccessKind.None,
+               FillRowMethodName = "_StreamXMLPlainLevel",
+               IsDeterministic = false,
+               IsPrecise = true,
+               TableDefinition = (@"Entry XML"))]
+        public static System.Collections.IEnumerable StreamNetXMLPlainLevel(
+           SqlString uri, SqlInt32 XMLLevel)
         {
-            using (System.Xml.XmlReader reader = System.Xml.XmlReader.Create(s))
+            System.Net.WebRequest request = System.Net.WebRequest.Create(uri.Value);
+            request.Method = "GET";
+            System.IO.Stream s = request.GetResponse().GetResponseStream();
+
+            return new XMLPlainLevelStreamer(s, XMLLevel.Value);
+        }
+
+        [SqlFunction(
+            DataAccess = DataAccessKind.None,
+            SystemDataAccess = SystemDataAccessKind.None,
+            FillRowMethodName = "_StreamXMLPlainLevel",
+            IsDeterministic = false,
+            IsPrecise = true,
+            TableDefinition = (@"Entry XML"))]
+        public static System.Collections.IEnumerable StreamFileXMLPlainLevel(
+           SqlString fileName, SqlInt32 XMLLevel)
+        {
+            System.IO.FileStream fs = new System.IO.FileStream(
+                 fileName.Value,
+                 System.IO.FileMode.Open,
+                 System.IO.FileAccess.Read,
+                 System.IO.FileShare.Read);
+            return new XMLPlainLevelStreamer(fs, XMLLevel.Value);
+        }
+
+        [SqlFunction(
+           DataAccess = DataAccessKind.None,
+           SystemDataAccess = SystemDataAccessKind.None,
+           FillRowMethodName = "_StreamLine",
+           IsDeterministic = false,
+           IsPrecise = true,
+           TableDefinition = (@"Line NVARCHAR(MAX)"))]
+        public static System.Collections.IEnumerable StreamNetLine(
+           SqlString uri)
+        {
+            System.Net.WebRequest request = System.Net.WebRequest.Create(uri.Value);
+            request.Method = "GET";
+            System.IO.Stream s = request.GetResponse().GetResponseStream();
+
+            return new LineStreamer(s);
+        }
+
+        [SqlFunction(
+           DataAccess = DataAccessKind.None,
+           SystemDataAccess = SystemDataAccessKind.None,
+           FillRowMethodName = "_StreamLine",
+           IsDeterministic = false,
+           IsPrecise = true,
+           TableDefinition = (@"Line NVARCHAR(MAX)"))]
+        public static System.Collections.IEnumerable StreamFileLine(
+           SqlString fileName)
+        {
+            System.IO.FileStream fs = new System.IO.FileStream(
+                            fileName.Value,
+                            System.IO.FileMode.Open,
+                            System.IO.FileAccess.Read,
+                            System.IO.FileShare.Read);
+
+            return new LineStreamer(fs);
+        }
+
+        #region Callbacks
+        protected static void _StreamXMLPlainLevel(object obj, out SqlXml entry)
+        {
+            entry = SqlXml.Null;
+
+            Dictionary<string, string> dRow = obj as Dictionary<string, string>;
+
+            #region Row Output
+            System.IO.MemoryStream ms = new System.IO.MemoryStream();
+
+            using (System.Xml.XmlWriter wr = System.Xml.XmlWriter.Create(ms))
             {
-                reader.MoveToContent();
+                wr.WriteStartElement("Row");
 
-                int iLevel = 0;
-
-                Dictionary<string, string> dResult = null;
-                string strParent = null;
-
-                while (reader.Read())
+                foreach (KeyValuePair<string, string> kvp in dRow)
                 {
-                    if (reader.NodeType == System.Xml.XmlNodeType.Element)
-                    {
-                        iLevel++;
-
-                        if (iLevel == iLevelToFind)
-                            dResult = new Dictionary<string, string>();
-
-                        strParent = reader.Name;
-                    }
-                    else if (reader.NodeType == System.Xml.XmlNodeType.EndElement)
-                    {
-                        iLevel--;
-
-
-                        if ((iLevel + 1) == iLevelToFind)
-                        {
-                            // produce row!
-                            if (rpd != null)
-                                rpd(dResult);
-                        }
-
-                    }
-                    else if (reader.NodeType != System.Xml.XmlNodeType.Whitespace)
-                    {
-                        dResult[strParent] = reader.Value;
-                    }
+                    wr.WriteStartElement(kvp.Key);
+                    wr.WriteString(kvp.Value);
+                    wr.WriteEndElement();
                 }
+
+                wr.WriteEndElement();
+
+                wr.Flush();
+                wr.Close();
             }
+            #endregion
+
+            ms.Seek(0, System.IO.SeekOrigin.Begin);
+            entry = new SqlXml(ms);
         }
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        protected static void _StreamLine(object obj, out SqlString line)
         {
-            throw new NotImplementedException();
+            line = obj as string;
         }
+        #endregion
     }
 }

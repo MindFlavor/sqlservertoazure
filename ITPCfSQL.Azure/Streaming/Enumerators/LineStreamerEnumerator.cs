@@ -45,11 +45,12 @@ namespace ITPCfSQL.Azure.Streaming.Enumerators
             }
         }
 
-        ~LineStreamerEnumerator()
-        {
-            if (sr != null)
-                sr.Dispose();
-        }
+        // Finalizers are not supported in SQL CLR
+        //~LineStreamerEnumerator()
+        //{
+        //    if (sr != null)
+        //        sr.Dispose();
+        //}
         #endregion
     }
 }
