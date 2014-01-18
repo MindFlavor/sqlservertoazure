@@ -753,9 +753,9 @@ namespace ITPCfSQL.Azure.Internal
         }
 
         public static string CreateTable(
-            bool useHTTPS,
-            string sharedKey,
             string accountName,
+            string sharedKey,
+            bool useHTTPS,
             string tableName,
             string xmsclientrequestId = null)
         {
@@ -850,9 +850,9 @@ namespace ITPCfSQL.Azure.Internal
         }
 
         public static string QueryTables(
-            bool useHTTPS,
-            string sharedKey,
             string accountName,
+            string sharedKey,
+            bool useHTTPS,
             string xmsclientrequestId = null)
         {
             string strUrl = string.Format("{0:S}/Tables", GetTableUrl(useHTTPS, accountName));
@@ -902,9 +902,28 @@ namespace ITPCfSQL.Azure.Internal
             string sharedKey,
             string accountName,
             string tableName,
+            string NextPartitionKey,
+            string NextRowKey,
+            out string continuationNextPartitionKey,
+            out string continuationNextRowKey,
             string xmsclientrequestId = null)
         {
+            continuationNextPartitionKey = null;
+            continuationNextRowKey = null;
+
             string strUrl = string.Format("{0:S}/{1:S}()", GetTableUrl(useHTTPS, accountName), tableName);
+
+            char cNext = '?';
+            if (!string.IsNullOrEmpty(NextPartitionKey))
+            {
+                strUrl += cNext + "NextPartitionKey=" + NextPartitionKey;
+                cNext = '&';
+            }
+            if (!string.IsNullOrEmpty(NextRowKey))
+            {
+                strUrl += cNext + "NextRowKey=" + NextRowKey;
+                cNext = '&';
+            }
 
             System.Net.HttpWebRequest Request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(strUrl);
             Request.Method = "GET";
@@ -930,6 +949,11 @@ namespace ITPCfSQL.Azure.Internal
 
             using (System.Net.HttpWebResponse response = (System.Net.HttpWebResponse)Request.GetResponse())
             {
+                if (response.Headers.AllKeys.Contains("x-ms-continuation-NextPartitionKey"))
+                    continuationNextPartitionKey = response.Headers["x-ms-continuation-NextPartitionKey"];
+                if (response.Headers.AllKeys.Contains("x-ms-continuation-NextRowKey"))
+                    continuationNextRowKey = response.Headers["x-ms-continuation-NextRowKey"];
+
                 string str;
                 using (System.IO.StreamReader sr = new System.IO.StreamReader(response.GetResponseStream()))
                 {
@@ -944,6 +968,7 @@ namespace ITPCfSQL.Azure.Internal
                     throw new Exceptions.UnexpectedResponseTypeCodeException(System.Net.HttpStatusCode.OK, response.StatusCode);
             }
         }
+
 
         public static string DeleteEntity(
             string accountName,

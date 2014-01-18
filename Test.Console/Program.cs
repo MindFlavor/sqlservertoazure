@@ -16,7 +16,23 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
+            Test.Console.TestStreaming.XMLPlainLevelStreamerFromHTTPS();
+            
+            //Test.Console.TestURIStream.Do();
+
             //Test.Console.TestQueueACL.Do();
+            //Test.Console.TestTable.Do();
+
+            //X509Store certStore = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+            //certStore.Open(OpenFlags.ReadOnly);
+
+            //foreach(var certInner in certStore.Certificates)
+            //{
+            //    Console.WriteLine(certInner);
+            //}
+
+            return;
+
 
 
         ITPCfSQL.Azure.Internal.InternalMethods.DeleteTable(

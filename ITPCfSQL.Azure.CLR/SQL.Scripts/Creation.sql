@@ -1041,3 +1041,22 @@ CREATE FUNCTION [Azure.Management].GetOperationStatus (
 )
 RETURNS NVARCHAR(255) EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Management].GetOperationStatus;
 GO
+
+--------------------
+--- Certificates ---
+--------------------
+CREATE FUNCTION [Azure.Management].ListCertificates()
+RETURNS TABLE(
+	FriendlyName NVARCHAR(MAX), 
+	IssuerName NVARCHAR(MAX), 
+	SubjectName NVARCHAR(MAX), 
+	Thumbprint NVARCHAR(255),
+	HasPrivateKey BIT,
+	NotAfter DATETIME,
+	NotBefore DATETIME,
+	SerialNumber NVARCHAR(255), 
+	SignatureAlgorithm NVARCHAR(255), 
+	[Subject] NVARCHAR(255)
+) 
+AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Utils].ListCertificates;
+GO

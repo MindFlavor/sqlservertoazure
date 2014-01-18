@@ -220,6 +220,8 @@ namespace ITPCfSQL.Azure.Internal
 
                     if (!dParams.ContainsKey(sKey))
                     {
+                        if ((sKey == "nextpartitionkey") || (sKey == "nextrowkey"))
+                            continue;
                         dParams[sKey] = new List<string>();
                     }
                     dParams[sKey].Add(sValue);
@@ -302,9 +304,9 @@ namespace ITPCfSQL.Azure.Internal
                 sb.Append("&st=" + signedstart);
             if (!string.IsNullOrEmpty(signedexpiry))
                 sb.Append("&se=" + signedexpiry);
-            
+
             sb.Append("&sr=" + Resource);
-            
+
             if (!string.IsNullOrEmpty(Permissions))
                 sb.Append("&sp=" + Permissions);
 

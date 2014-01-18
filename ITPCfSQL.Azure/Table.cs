@@ -45,11 +45,34 @@ namespace ITPCfSQL.Azure
                  AzureTableService.AccountName, AzureTableService.SharedKey, AzureTableService.UseHTTPS, this.Name, xmsclientrequestId);
         }
 
-        public System.Collections.Generic.IEnumerable<TableEntity> Query(string xmsclientrequestId = null)
+        public IEnumerable<TableEntity> Query(
+            string xmsclientrequestId = null)
+        {
+            string continuationNextPartitionKey = null;
+            string continuationNextRowKey = null;
+
+            do
+            {
+                List<TableEntity> lRet = this._QueryInternal(continuationNextPartitionKey, continuationNextRowKey, out  continuationNextPartitionKey, out  continuationNextRowKey);
+                foreach (TableEntity te in lRet)
+                    yield return te;
+            } while ((!string.IsNullOrEmpty(continuationNextPartitionKey)) || (!string.IsNullOrEmpty(continuationNextRowKey)));
+        }
+
+        internal List<TableEntity> _QueryInternal(
+            string NextPartitionKey,
+            string NextRowKey,
+            out string continuationNextPartitionKey,
+            out string continuationNextRowKey,
+            string xmsclientrequestId = null)
         {
             List<TableEntity> lEntities = new List<TableEntity>();
+
             string res = ITPCfSQL.Azure.Internal.InternalMethods.QueryTable(
-                AzureTableService.UseHTTPS, AzureTableService.SharedKey, AzureTableService.AccountName, this.Name, xmsclientrequestId);
+                AzureTableService.UseHTTPS, AzureTableService.SharedKey, AzureTableService.AccountName, this.Name, 
+                NextPartitionKey, NextRowKey,
+                out continuationNextPartitionKey, out continuationNextRowKey,
+                xmsclientrequestId);
 
             System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
 
@@ -65,6 +88,7 @@ namespace ITPCfSQL.Azure
             man.AddNamespace("d", "http://schemas.microsoft.com/ado/2007/08/dataservices");
             man.AddNamespace("m", "http://schemas.microsoft.com/ado/2007/08/dataservices/metadata");
             man.AddNamespace("f", "http://www.w3.org/2005/Atom");
+
 
             foreach (System.Xml.XmlNode node in doc.SelectNodes("f:feed/f:entry", man))
             {
@@ -85,8 +109,11 @@ namespace ITPCfSQL.Azure
                     nFollow = nFollow.NextSibling;
                 }
 
-                yield return te;
+                lEntities.Add(te);
+
             }
+            return lEntities;
+
         }
     }
 }

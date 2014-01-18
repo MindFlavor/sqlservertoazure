@@ -14,7 +14,7 @@ namespace ITPCfSQL.Azure
         {
             List<Table> lTables = new List<Table>();
 
-            string strResult = Internal.InternalMethods.QueryTables(UseHTTPS, SharedKey, AccountName, xmsclientrequestId);
+            string strResult = Internal.InternalMethods.QueryTables(AccountName, SharedKey, UseHTTPS, xmsclientrequestId);
 
             System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
             using (System.Xml.XmlReader re = System.Xml.XmlReader.Create(new System.IO.StringReader(strResult)))
@@ -49,11 +49,11 @@ namespace ITPCfSQL.Azure
             string xmsclientrequestId = null)
         {
 
-            string strResult = Internal.InternalMethods.CreateTable(UseHTTPS, SharedKey, AccountName, tableName, xmsclientrequestId);
+            string strResult = Internal.InternalMethods.CreateTable(AccountName, SharedKey, UseHTTPS, tableName, xmsclientrequestId);
             Table t = new Table()
             {
                 AzureTableService = this,
-                Name = tableName                
+                Name = tableName
             };
             t.Url = Table.GenerateUriFromParameters(t);
 

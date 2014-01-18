@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Data.SqlClient;
 using System.Data.SqlTypes;
+using System.Security.Cryptography.X509Certificates;
 
 namespace ITPCfSQL.Azure.CLR
 {
@@ -297,7 +298,7 @@ namespace ITPCfSQL.Azure.CLR
             SystemDataAccess = SystemDataAccessKind.None)]
         public static SqlString GeneratePolicyBlobSharedAccessSignatureURI(
             SqlString resourceUri, SqlString sharedKey,
-            SqlString resourceType,            
+            SqlString resourceType,
            SqlString identifier)
         {
             return ITPCfSQL.Azure.Internal.Signature.GenerateSharedAccessSignatureURI(
@@ -344,6 +345,68 @@ namespace ITPCfSQL.Azure.CLR
         public static string WithAccess(string str)
         {
             return str.ToUpper();
+        }
+        #endregion
+
+        #region Certificates
+        [SqlFunction(
+            DataAccess = DataAccessKind.None,
+            FillRowMethodName = "_ListCertificatesCallback",
+            IsDeterministic = false,
+            IsPrecise = true,
+            SystemDataAccess = SystemDataAccessKind.None,
+            TableDefinition = "FriendlyName NVARCHAR(MAX), IssuerName NVARCHAR(MAX), SubjectName NVARCHAR(MAX), Thumbprint NVARCHAR(255), HasPrivateKey BIT, NotAfter DATETIME, NotBefore DATETIME, SerialNumber NVARCHAR(255), SignatureAlgorithm NVARCHAR(255), [Subject] NVARCHAR(255)")]
+        public static System.Collections.IEnumerable ListCertificates()
+        {
+            X509Store certStore = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+            certStore.Open(OpenFlags.ReadOnly);
+
+            return certStore.Certificates;
+        }
+        public static void _ListCertificatesCallback(Object obj,
+           out SqlString FriendlyName,
+           out SqlString IssuerName,
+           out SqlString SubjectName,
+           out SqlString Thumbprint,
+           out SqlBoolean HasPrivateKey,
+           out SqlDateTime NotAfter,
+           out SqlDateTime NotBefore,
+           out SqlString SerialNumber,
+           out SqlString SignatureAlgorithm,
+           out SqlString Subject)
+        {
+            X509Certificate2 cert = obj as X509Certificate2;
+
+            FriendlyName = cert.FriendlyName;
+            IssuerName = cert.IssuerName.Name;
+            SubjectName = cert.SubjectName.Name;
+            Thumbprint = cert.Thumbprint;
+            HasPrivateKey = cert.HasPrivateKey;
+            NotAfter = cert.NotAfter;
+            NotBefore = cert.NotBefore;
+            SerialNumber = cert.SerialNumber;
+            SignatureAlgorithm = cert.SignatureAlgorithm.FriendlyName;
+            Subject = cert.Subject;
+        }
+        #endregion
+
+        #region URI simple methods
+        [SqlFunction
+            (IsDeterministic = true,
+            IsPrecise = true,
+            DataAccess = DataAccessKind.None,
+            SystemDataAccess = SystemDataAccessKind.None)]
+        public static SqlString DownloadURI(SqlString URI)
+        {
+            System.Net.WebRequest req = System.Net.HttpWebRequest.Create(URI.ToString());
+            req.Method = "GET";
+
+            System.Net.WebResponse resp = req.GetResponse();
+
+            using (System.IO.StreamReader sr = new System.IO.StreamReader(resp.GetResponseStream()))
+            {
+                return sr.ReadToEnd();
+            }
         }
         #endregion
     }
