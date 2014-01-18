@@ -96,7 +96,7 @@ namespace ITPCfSQL.Azure.CLR.Streaming
             System.Net.WebRequest request = System.Net.WebRequest.Create(uri.Value);
             request.Method = "GET";
             List<string> lStreams = new List<string>();
-            
+
             using (System.IO.Stream s = request.GetResponse().GetResponseStream())
             {
 
@@ -110,6 +110,37 @@ namespace ITPCfSQL.Azure.CLR.Streaming
 
             return lStreams;
         }
+
+        [SqlFunction(
+           DataAccess = DataAccessKind.None,
+           SystemDataAccess = SystemDataAccessKind.None,
+           FillRowMethodName = "_StreamLine",
+           IsDeterministic = false,
+           IsPrecise = true,
+           TableDefinition = (@"Line NVARCHAR(MAX)"))]
+        public static System.Collections.IEnumerable BlockingFileLine(
+           SqlString fileName)
+        {
+            List<string> lStreams = new List<string>();
+
+            using (System.IO.FileStream fs = new System.IO.FileStream(
+                            fileName.Value,
+                            System.IO.FileMode.Open,
+                            System.IO.FileAccess.Read,
+                            System.IO.FileShare.Read))
+            {
+
+                using (System.IO.StreamReader sr = new System.IO.StreamReader(fs))
+                {
+                    string str;
+                    while ((str = sr.ReadLine()) != null)
+                        lStreams.Add(str);
+                }
+            }
+
+            return lStreams;
+        }
+
         #endregion
 
         #region Callbacks

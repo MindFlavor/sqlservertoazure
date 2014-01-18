@@ -1106,6 +1106,13 @@ RETURNS TABLE(
 AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Streaming.Stream].BlockingNetLine;
 GO
 
+CREATE FUNCTION [Streaming].BlockingFileLine(@fileName NVARCHAR(4000))
+RETURNS TABLE(
+	[Line] NVARCHAR(MAX)
+) 
+AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Streaming.Stream].BlockingFileLine;
+GO
+
 USE [master]
 GO
 
