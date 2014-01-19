@@ -6,8 +6,8 @@
 USE [master];
 GO
 
-CREATE ASYMMETRIC KEY [AzureKey] FROM EXECUTABLE FILE = 'C:\GIT\SQLServerToAzure\ITPCfSQL.Azure.CLR\bin\debug\ITPCfSQL.Azure.CLR.dll'
---CREATE ASYMMETRIC KEY [AzureKey] FROM EXECUTABLE FILE = '<ITPCfSQL.Azure.CLR.dll path, nvarchar(4000), DLLPath>'
+--CREATE ASYMMETRIC KEY [AzureKey] FROM EXECUTABLE FILE = 'C:\GIT\SQLServerToAzure\ITPCfSQL.Azure.CLR\bin\debug\ITPCfSQL.Azure.CLR.dll'
+CREATE ASYMMETRIC KEY [AzureKey] FROM EXECUTABLE FILE = '<ITPCfSQL.Azure.CLR.dll path, nvarchar(4000), DLLPath>'
 
 CREATE LOGIN [AzureLogin] FROM ASYMMETRIC KEY [AzureKey];
 
@@ -31,8 +31,8 @@ GO
 CREATE SCHEMA [Streaming]
 GO
 
-CREATE ASSEMBLY [ITPCfSQL.Azure.CLR] FROM 'C:\GIT\SQLServerToAzure\ITPCfSQL.Azure.CLR\bin\debug\ITPCfSQL.Azure.CLR.dll'
---CREATE ASSEMBLY [ITPCfSQL.Azure.CLR] FROM '<ITPCfSQL.Azure.CLR.dll path, nvarchar(4000), DLLPath>'
+--CREATE ASSEMBLY [ITPCfSQL.Azure.CLR] FROM 'C:\GIT\SQLServerToAzure\ITPCfSQL.Azure.CLR\bin\debug\ITPCfSQL.Azure.CLR.dll'
+CREATE ASSEMBLY [ITPCfSQL.Azure.CLR] FROM '<ITPCfSQL.Azure.CLR.dll path, nvarchar(4000), DLLPath>'
 
 WITH PERMISSION_SET=EXTERNAL_ACCESS;
 GO
@@ -1094,6 +1094,13 @@ RETURNS TABLE(
 	[Line] NVARCHAR(MAX)
 ) 
 AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Streaming.Stream].StreamFileLine;
+GO
+
+CREATE FUNCTION [Streaming].StringSplit(@content NVARCHAR(MAX), @delimiter NVARCHAR(255))
+RETURNS TABLE(
+	[Line] NVARCHAR(MAX)
+) 
+AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Streaming.Stream].StringSplit;
 GO
 
 --------------------

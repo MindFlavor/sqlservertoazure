@@ -81,6 +81,19 @@ namespace ITPCfSQL.Azure.CLR.Streaming
             return new LineStreamer(fs);
         }
 
+        [SqlFunction(
+           DataAccess = DataAccessKind.None,
+           SystemDataAccess = SystemDataAccessKind.None,
+           FillRowMethodName = "_StreamLine",
+           IsDeterministic = false,
+           IsPrecise = true,
+           TableDefinition = (@"Token NVARCHAR(MAX)"))]
+        public static System.Collections.IEnumerable StringSplit(
+           SqlString str, SqlString delimiter)
+        {
+            return new ITPCfSQL.Azure.Streaming.StringSplit(str.Value, delimiter.Value);
+        }
+
 
         #region Blog function -- to delete
         [SqlFunction(

@@ -16,8 +16,8 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            Test.Console.TestStreaming.XMLPlainLevelStreamerFromHTTPS();
-            
+            Test.Console.TestStreaming.StringSplit();
+            //Test.Console.TestStreaming.XMLPlainLevelStreamerFromHTTPS();          
             //Test.Console.TestURIStream.Do();
 
             //Test.Console.TestQueueACL.Do();

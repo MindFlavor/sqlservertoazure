@@ -85,10 +85,12 @@
     <Compile Include="Responses\GetBlobPropertyResponse.cs" />
     <Compile Include="Responses\LeaseBlobResponse.cs" />
     <Compile Include="SharedAccessSignature\Signature.cs" />
+    <Compile Include="Streaming\Enumerators\StringSplitEnumerator.cs" />
     <Compile Include="Streaming\LineStreamer.cs" />
     <Compile Include="Streaming\Enumerators\LineStreamerEnumerator.cs" />
     <Compile Include="Streaming\Streamer.cs" />
     <Compile Include="Streaming\Enumerators\XMLPlainLevelEnumerator.cs" />
+    <Compile Include="Streaming\StringSplit.cs" />
     <Compile Include="Streaming\XMLPlainLevelStreamer.cs" />
     <Compile Include="Table.cs" />
     <Compile Include="TableEntity.cs" />
