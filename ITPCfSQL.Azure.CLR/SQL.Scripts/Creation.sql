@@ -1096,6 +1096,29 @@ RETURNS TABLE(
 AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Streaming.Stream].StreamFileLine;
 GO
 
+CREATE FUNCTION [Streaming].StringSplit(@content NVARCHAR(MAX), @delimiter NVARCHAR(255))
+RETURNS TABLE(
+	[Line] NVARCHAR(MAX)
+) 
+AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Streaming.Stream].StringSplit;
+GO
+
+--------------------
+---- Streaming -- Blog -----
+--------------------
+CREATE FUNCTION [Streaming].BlockingNetLine(@URI NVARCHAR(4000))
+RETURNS TABLE(
+	[Line] NVARCHAR(MAX)
+) 
+AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Streaming.Stream].BlockingNetLine;
+GO
+
+CREATE FUNCTION [Streaming].BlockingFileLine(@fileName NVARCHAR(4000))
+RETURNS TABLE(
+	[Line] NVARCHAR(MAX)
+) 
+AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Streaming.Stream].BlockingFileLine;
+GO
 
 USE [master]
 GO

@@ -81,6 +81,81 @@ namespace ITPCfSQL.Azure.CLR.Streaming
             return new LineStreamer(fs);
         }
 
+        [SqlFunction(
+           DataAccess = DataAccessKind.None,
+           SystemDataAccess = SystemDataAccessKind.None,
+           FillRowMethodName = "_StreamLine",
+           IsDeterministic = false,
+           IsPrecise = true,
+           TableDefinition = (@"Token NVARCHAR(MAX)"))]
+        public static System.Collections.IEnumerable StringSplit(
+           SqlString str, SqlString delimiter)
+        {
+            return new ITPCfSQL.Azure.Streaming.StringSplit(str.Value, delimiter.Value);
+        }
+
+
+        #region Blog function -- to delete
+        [SqlFunction(
+           DataAccess = DataAccessKind.None,
+           SystemDataAccess = SystemDataAccessKind.None,
+           FillRowMethodName = "_StreamLine",
+           IsDeterministic = false,
+           IsPrecise = true,
+           TableDefinition = (@"Line NVARCHAR(MAX)"))]
+        public static System.Collections.IEnumerable BlockingNetLine(
+           SqlString uri)
+        {
+            System.Net.WebRequest request = System.Net.WebRequest.Create(uri.Value);
+            request.Method = "GET";
+            List<string> lStreams = new List<string>();
+
+            using (System.IO.Stream s = request.GetResponse().GetResponseStream())
+            {
+
+                using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
+                {
+                    string str;
+                    while ((str = sr.ReadLine()) != null)
+                        lStreams.Add(str);
+                }
+            }
+
+            return lStreams;
+        }
+
+        [SqlFunction(
+           DataAccess = DataAccessKind.None,
+           SystemDataAccess = SystemDataAccessKind.None,
+           FillRowMethodName = "_StreamLine",
+           IsDeterministic = false,
+           IsPrecise = true,
+           TableDefinition = (@"Line NVARCHAR(MAX)"))]
+        public static System.Collections.IEnumerable BlockingFileLine(
+           SqlString fileName)
+        {
+            List<string> lStreams = new List<string>();
+
+            using (System.IO.FileStream fs = new System.IO.FileStream(
+                            fileName.Value,
+                            System.IO.FileMode.Open,
+                            System.IO.FileAccess.Read,
+                            System.IO.FileShare.Read))
+            {
+
+                using (System.IO.StreamReader sr = new System.IO.StreamReader(fs))
+                {
+                    string str;
+                    while ((str = sr.ReadLine()) != null)
+                        lStreams.Add(str);
+                }
+            }
+
+            return lStreams;
+        }
+
+        #endregion
+
         #region Callbacks
         protected static void _StreamXMLPlainLevel(object obj, out SqlXml entry)
         {
