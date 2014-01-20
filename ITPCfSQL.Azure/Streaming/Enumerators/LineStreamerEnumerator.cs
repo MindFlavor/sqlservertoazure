@@ -18,10 +18,7 @@ namespace ITPCfSQL.Azure.Streaming.Enumerators
 
         object System.Collections.IEnumerator.Current
         {
-            get
-            {
-                return _CurrentLine;
-            }
+            get { return _CurrentLine; }
         }
 
         bool System.Collections.IEnumerator.MoveNext()
