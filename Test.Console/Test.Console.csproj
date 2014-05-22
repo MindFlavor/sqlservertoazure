@@ -44,6 +44,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestBuffering.cs" />
+    <Compile Include="TestEventTimeNormalizer.cs" />
     <Compile Include="TestQueueACL.cs" />
     <Compile Include="TestStreaming.cs" />
     <Compile Include="TestTable.cs" />

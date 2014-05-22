@@ -73,6 +73,8 @@
     <Compile Include="Management\Deployment.cs" />
     <Compile Include="Management\Operation.cs" />
     <Compile Include="Management\Services.cs" />
+    <Compile Include="TimeNormalization\DateValuePair.cs" />
+    <Compile Include="TimeNormalization\StreamNormalizer.cs" />
     <Compile Include="Responses\CopyBlobResponse.cs" />
     <Compile Include="Internal\InternalMethods.cs" />
     <Compile Include="Message.cs" />

@@ -16,7 +16,9 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            Test.Console.TestBuffering.Do();
+            Test.Console.TestEventTimeNormalizer.Do();
+
+            //Test.Console.TestBuffering.Do();
             //Test.Console.TestStreaming.StringSplit();
             //Test.Console.TestStreaming.XMLPlainLevelStreamerFromHTTPS();          
             //Test.Console.TestURIStream.Do();

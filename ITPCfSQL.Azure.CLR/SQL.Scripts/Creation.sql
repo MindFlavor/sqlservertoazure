@@ -6,8 +6,8 @@
 USE [master];
 GO
 
---CREATE ASYMMETRIC KEY [AzureKey] FROM EXECUTABLE FILE = 'C:\GIT\SQLServerToAzure\ITPCfSQL.Azure.CLR\bin\debug\ITPCfSQL.Azure.CLR.dll'
-CREATE ASYMMETRIC KEY [AzureKey] FROM EXECUTABLE FILE = '<ITPCfSQL.Azure.CLR.dll path, nvarchar(4000), DLLPath>'
+CREATE ASYMMETRIC KEY [AzureKey] FROM EXECUTABLE FILE = 'D:\GIT\SQLServerToAzure\ITPCfSQL.Azure.CLR\bin\Debug\ITPCfSQL.Azure.CLR.dll'
+--CREATE ASYMMETRIC KEY [AzureKey] FROM EXECUTABLE FILE = '<ITPCfSQL.Azure.CLR.dll path, nvarchar(4000), DLLPath>'
 
 CREATE LOGIN [AzureLogin] FROM ASYMMETRIC KEY [AzureKey];
 
@@ -31,8 +31,8 @@ GO
 CREATE SCHEMA [Streaming]
 GO
 
---CREATE ASSEMBLY [ITPCfSQL.Azure.CLR] FROM 'C:\GIT\SQLServerToAzure\ITPCfSQL.Azure.CLR\bin\debug\ITPCfSQL.Azure.CLR.dll'
-CREATE ASSEMBLY [ITPCfSQL.Azure.CLR] FROM '<ITPCfSQL.Azure.CLR.dll path, nvarchar(4000), DLLPath>'
+CREATE ASSEMBLY [ITPCfSQL.Azure.CLR] FROM 'D:\GIT\SQLServerToAzure\ITPCfSQL.Azure.CLR\bin\Debug\ITPCfSQL.Azure.CLR.dll'
+--CREATE ASSEMBLY [ITPCfSQL.Azure.CLR] FROM '<ITPCfSQL.Azure.CLR.dll path, nvarchar(4000), DLLPath>'
 
 WITH PERMISSION_SET=EXTERNAL_ACCESS;
 GO
@@ -1101,6 +1101,32 @@ RETURNS TABLE(
 	[Line] NVARCHAR(MAX)
 ) 
 AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Streaming.Stream].StringSplit;
+GO
+
+CREATE PROCEDURE [Streaming].FileStringSplitToTable(@fileName NVARCHAR(MAX), @delimiter NVARCHAR(255))
+AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.Streaming.Stream].FileStringSplitToTable;
+GO
+
+
+-----------------------------
+------ TimeNormalization ----
+-----------------------------
+CREATE SCHEMA Normalization;
+GO
+
+CREATE FUNCTION [Normalization].TimeNormalize(@statement NVARCHAR(MAX), @days INT, @hours INT, @minutes INT, @seconds INT, @milliseconds INT)
+RETURNS TABLE(
+	[EventTime]			DATETIME,
+	[NormalizedValue]	FLOAT
+) 
+AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.TimeNormalization.TimeNormalizer].TimeNormalize;
+GO
+
+CREATE FUNCTION [Normalization].TimeNormalize_TestType(@statement NVARCHAR(MAX), @days INT, @hours INT, @minutes INT, @seconds INT, @milliseconds INT)
+RETURNS TABLE(
+	[val] NVARCHAR(MAX)
+) 
+AS EXTERNAL NAME [ITPCfSQL.Azure.CLR].[ITPCfSQL.Azure.CLR.TimeNormalization.TimeNormalizer].TimeNormalize_TestType;
 GO
 
 --------------------

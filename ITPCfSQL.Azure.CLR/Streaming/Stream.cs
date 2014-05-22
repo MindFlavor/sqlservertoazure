@@ -94,6 +94,58 @@ namespace ITPCfSQL.Azure.CLR.Streaming
             return new ITPCfSQL.Azure.Streaming.StringSplit(str.Value, delimiter.Value);
         }
 
+        [SqlProcedure]
+        public static void FileStringSplitToTable(
+           SqlString fileName, SqlString delimiter)
+        {
+            string[] delimiters = new string[] { delimiter.Value };
+
+            using (System.IO.StreamReader sr = new System.IO.StreamReader(new System.IO.FileStream(
+                fileName.Value, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read)))
+            {
+                string str;
+                SqlMetaData[] sqlMetadatas = null;
+                bool fFirst = true;
+
+                while ((str = sr.ReadLine()) != null)
+                {
+                    string[] tokens = str.Split(delimiters, StringSplitOptions.None);
+
+                    if (sqlMetadatas == null)
+                    {
+                        sqlMetadatas = new SqlMetaData[tokens.Length];
+                        for (int iToken = 0; iToken < tokens.Length; iToken++)
+                        {
+                            sqlMetadatas[iToken] = new SqlMetaData("Field_" + iToken, System.Data.SqlDbType.NVarChar, -1);
+                        }
+                    }
+
+                    #region Output fields
+                    SqlDataRecord record = new SqlDataRecord(sqlMetadatas);
+                    int i;
+                    for (i = 0; i < tokens.Length; i++)
+                    {
+                        record.SetString(i, tokens[i]);
+                    }
+                    for (; i < sqlMetadatas.Length; i++)  // add NULLs if need be.
+                    {
+                        record.SetDBNull(i);
+                    }
+
+                    if (fFirst)
+                    {
+                        SqlContext.Pipe.SendResultsStart(record);
+                        fFirst = false;
+                    }
+
+                    SqlContext.Pipe.SendResultsRow(record);
+                    #endregion
+                }
+
+                SqlContext.Pipe.SendResultsEnd();
+            }
+        }
+
 
         #region Blog function -- to delete
         [SqlFunction(

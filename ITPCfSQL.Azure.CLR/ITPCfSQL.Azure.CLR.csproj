@@ -58,6 +58,7 @@
     <Compile Include="Queue.cs" />
     <Compile Include="Streaming\Stream.cs" />
     <Compile Include="Table.cs" />
+    <Compile Include="TimeNormalization\TimeNormalizer.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -82,6 +83,7 @@
     <Content Include="SQL.Scripts\Demo\BackupToAzure.sql" />
     <Content Include="SQL.Scripts\Demo\SampleExecution.sql" />
     <Content Include="SQL.Scripts\Demo\Streaming.sql" />
+    <Content Include="SQL.Scripts\Demo\TimeNormalization.sql" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
