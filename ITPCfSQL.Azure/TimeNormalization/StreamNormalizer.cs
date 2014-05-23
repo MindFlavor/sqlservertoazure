@@ -50,6 +50,10 @@ namespace ITPCfSQL.Azure.TimeNormalization
             if (fFirst)
             {
                 Start(dvp);
+
+                // Add itself as first event
+                lDVPs.Add(dvp);
+
                 return lDVPs;
             }
 
@@ -59,7 +63,7 @@ namespace ITPCfSQL.Azure.TimeNormalization
             {
                 double dUsedMS = Math.Min((NextStep - CurrentTime).TotalMilliseconds, 1000);
                 AccumulatedValue += (dUsedMS * Current.Value) / 1000.0D;
-                lDVPs.Add(new DateValuePair(-1) { Date = CurrentStep, Value = AccumulatedValue });
+                lDVPs.Add(new DateValuePair(-1) { Date = NextStep, Value = AccumulatedValue });
                 AccumulatedValue = 0;
 
                 CurrentStep = NextStep;
@@ -74,6 +78,13 @@ namespace ITPCfSQL.Azure.TimeNormalization
             Current = dvp;
 
             return lDVPs;
+        }
+
+        public DateValuePair Finish()
+        {
+            var ret = Push(new DateValuePair() { Date = CurrentStep.Add(Step), Value = Current.Value});
+
+            return ret[0];
         }
     }
 }

@@ -58,6 +58,8 @@ namespace ITPCfSQL.Azure.CLR.TimeNormalization
                        }
                    }                   
                }
+
+               lDVPs.Add(sn.Finish());
                return lDVPs;
            }
         }
@@ -103,6 +105,8 @@ namespace ITPCfSQL.Azure.CLR.TimeNormalization
                         }
                     }
                 }
+
+               
                 return lDVPs;
             }
         }
