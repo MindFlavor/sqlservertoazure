@@ -36,7 +36,7 @@ SELECT
 	,CONVERT(FLOAT, Cnt)			AS 'Cnt'
 FROM #import
 WHERE 
-	[Server] + ' - ' + [Status]	= 'EPDBACP501 - dormant'
+	[Server] + ' - ' + [Status]	= 'TTTBACP504 - dormant'
 ORDER BY 
 	CONVERT(DATETIME, EventTime);
 
@@ -47,7 +47,7 @@ SELECT * FROM [Normalization].TimeNormalize(
 		,CONVERT(FLOAT, Cnt)			AS ''Cnt''
 	FROM #import
 	WHERE 
-		[Server] + '' - '' + [Status]	= ''EPDBACP501 - dormant''
+		[Server] + '' - '' + [Status]	= ''TTTBACP504 - dormant''
 	ORDER BY 
 		CONVERT(DATETIME, EventTime);'
 , 0, 0,0,1,0);
