@@ -8,10 +8,12 @@ namespace ITPCfSQL.Azure.TimeNormalization.Scatter
 {
     public class RandomScatter
     {
-        #region Properties
-        public TimeSpan Step { get; set; }
+        #region Members
+        public Random _random;
+        #endregion
 
-        public Random _random;        
+        #region Properties
+        public TimeSpan Step { get; set; }        
         #endregion
 
         #region Constructors
@@ -19,16 +21,16 @@ namespace ITPCfSQL.Azure.TimeNormalization.Scatter
             TimeSpan tsStep)
         {
             this.Step = tsStep;
-            rand
+            _random = new Random();
         }
         #endregion
 
-        public DateValuePair Scatter(DateValuePair dvp)
+        public List<DateValuePair> Push(DateValuePair dvp)
         {
-
-            DateValuePair dvpOutput = (DateValuePair)dvp.Clone();
-
-
+            List<DateValuePair> lDVP = new List<DateValuePair>(1);
+            lDVP.Add((DateValuePair)dvp.Clone());
+            lDVP[0].Date.AddMilliseconds(_random.NextDouble() * Step.TotalMilliseconds);
+            return lDVP;
         }
     }
 }
