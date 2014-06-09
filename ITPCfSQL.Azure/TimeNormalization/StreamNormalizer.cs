@@ -82,7 +82,11 @@ namespace ITPCfSQL.Azure.TimeNormalization
 
         public DateValuePair Finish()
         {
-            var ret = Push(new DateValuePair() { Date = CurrentStep.Add(Step), Value = Current.Value});
+            if (Current.Date == CurrentStep)
+                return null;
+
+            DateValuePair dvp = new DateValuePair() { Date = CurrentStep.Add(Step), Value = Current.Value };            
+            var ret = Push(dvp);
 
             return ret[0];
         }
