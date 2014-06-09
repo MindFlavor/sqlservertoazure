@@ -74,6 +74,7 @@
     <Compile Include="Management\Operation.cs" />
     <Compile Include="Management\Services.cs" />
     <Compile Include="TimeNormalization\DateValuePair.cs" />
+    <Compile Include="TimeNormalization\Scatter\EvenlyDistribute.cs" />
     <Compile Include="TimeNormalization\Scatter\RandomScatter.cs" />
     <Compile Include="TimeNormalization\StreamNormalizer.cs" />
     <Compile Include="Responses\CopyBlobResponse.cs" />

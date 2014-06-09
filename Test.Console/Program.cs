@@ -16,7 +16,13 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            Test.Console.TestEventTimeNormalizer.Do();
+            System.Console.WriteLine("Random:");
+            Test.Console.TestScatter.DoRandom();
+            
+            System.Console.WriteLine("Evenly:");
+            Test.Console.TestScatter.DoEven();
+
+            //Test.Console.TestEventTimeNormalizer.Do();
 
             //Test.Console.TestBuffering.Do();
             //Test.Console.TestStreaming.StringSplit();

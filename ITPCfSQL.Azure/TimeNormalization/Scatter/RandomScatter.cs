@@ -13,7 +13,7 @@ namespace ITPCfSQL.Azure.TimeNormalization.Scatter
         #endregion
 
         #region Properties
-        public TimeSpan Step { get; set; }        
+        public TimeSpan Step { get; set; }
         #endregion
 
         #region Constructors
@@ -29,7 +29,8 @@ namespace ITPCfSQL.Azure.TimeNormalization.Scatter
         {
             List<DateValuePair> lDVP = new List<DateValuePair>(1);
             lDVP.Add((DateValuePair)dvp.Clone());
-            lDVP[0].Date.AddMilliseconds(_random.NextDouble() * Step.TotalMilliseconds);
+
+            lDVP[0].Date = lDVP[0].Date.AddMilliseconds(_random.NextDouble() * Step.TotalMilliseconds);
             return lDVP;
         }
     }
