@@ -14,7 +14,7 @@ namespace ITPCfSQL.Azure.TimeNormalization.Scatter
         #endregion
 
         #region Properties
-        public TimeSpan Step { get; set; }        
+        public TimeSpan Step { get; set; }
         #endregion
 
         #region Constructors
@@ -33,13 +33,13 @@ namespace ITPCfSQL.Azure.TimeNormalization.Scatter
 
         public List<DateValuePair> Push(DateValuePair dvp)
         {
-            if(dvp.Date >= dtNextStep)
+            if (dvp.Date >= dtNextStep)
             {
                 // output collected
                 double dMSEven = Step.TotalMilliseconds / ((double)lDVP.Count);
-                for(int i=0; i<lDVP.Count; i++)
+                for (int i = 0; i < lDVP.Count; i++)
                 {
-                    lDVP[i].Date.AddMilliseconds(dMSEven);                    
+                    lDVP[i].Date = lDVP[i].Date.AddMilliseconds(dMSEven*i);
                 }
 
                 List<DateValuePair> lDVPOutput = lDVP;
@@ -49,7 +49,7 @@ namespace ITPCfSQL.Azure.TimeNormalization.Scatter
                 lDVP.Add(dvp);
 
                 // Find next step containing this dvp... this *should* be optimized
-                while (dvp.Date >= dtNextStep.Add(Step))
+                while (dvp.Date >= (dtNextStep.Add(Step)))
                 {
                     dtNextStep = dtNextStep.Add(Step);
                 }
