@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ITPCfSQL.Azure.TimeNormalization
 {
-    public class DateValuePair
+    public class DateValuePair : ICloneable
     {
         public DateValuePair()
         {
@@ -23,6 +23,16 @@ namespace ITPCfSQL.Azure.TimeNormalization
         public override string ToString()
         {
             return this.GetType().Name + "[Date=" + Date + ", Value=" + Value + "]";
+        }
+
+        public object Clone()
+        {
+            return new DateValuePair()
+            {
+                OriginalPosition = this.OriginalPosition,
+                Date = this.Date,
+                Value = this.Value
+            };
         }
     }
 }
