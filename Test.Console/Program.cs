@@ -16,11 +16,11 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            System.Console.WriteLine("Random:");
-            Test.Console.TestScatter.DoRandom();
+            //System.Console.WriteLine("Random:");
+            //Test.Console.TestScatter.DoRandom();
             
-            System.Console.WriteLine("Evenly:");
-            Test.Console.TestScatter.DoEven();
+            //System.Console.WriteLine("Evenly:");
+            //Test.Console.TestScatter.DoEven();
 
             //Test.Console.TestEventTimeNormalizer.Do();
 
@@ -32,13 +32,25 @@ namespace TestConsole
             //Test.Console.TestQueueACL.Do();
             //Test.Console.TestTable.Do();
 
-            //X509Store certStore = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-            //certStore.Open(OpenFlags.ReadOnly);
+            X509Store certStore = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+            certStore.Open(OpenFlags.ReadOnly);
 
-            //foreach(var certInner in certStore.Certificates)
-            //{
-            //    Console.WriteLine(certInner);
-            //}
+            foreach (var certInner in certStore.Certificates)
+            {
+                Console.WriteLine(certInner);
+            }
+
+            X509Store certStore2 = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+            certStore2.Open(OpenFlags.ReadOnly);
+
+            X509Certificate2Collection certCollection = certStore2.Certificates.Find(
+                X509FindType.FindByThumbprint,
+                args[0],
+                false);
+            certStore2.Close();
+
+            Console.WriteLine("certCollection.Count == " + certCollection.Count);
+
 
             return;
 

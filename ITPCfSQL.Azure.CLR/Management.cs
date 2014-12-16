@@ -16,17 +16,37 @@ namespace ITPCfSQL.Azure.CLR
             X509Store certStore = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             certStore.Open(OpenFlags.ReadOnly);
 
-            X509Certificate2Collection certCollection = certStore.Certificates.Find(
-                X509FindType.FindByThumbprint,
-                certificateThumbprint,
-                false);
-            certStore.Close();
+            //X509Certificate2Collection certCollection = certStore.Certificates.Find(
+            //    X509FindType.FindByThumbprint,
+            //    certificateThumbprint,
+            //    true);
 
-            if ((certCollection == null) || (certCollection.Count == 0))
-                throw new ArgumentException("Certificate with thumbprint " + certificateThumbprint + " not found in the " +
-                    "certificate store[Name=" + certStore.Name + ", Location=" + certStore.Location.ToString() + "]");
+            //certStore.Close();
 
-            return certCollection[0];
+            X509Certificate2 cert = null;
+
+            foreach (var certInner in certStore.Certificates)
+            {
+                if (certInner.Thumbprint.Equals(certificateThumbprint, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    cert = certInner;
+                    break;
+                }
+            }
+
+            if (cert == null)
+            {
+                throw new ArgumentException("Certificate with thumbprint \"" + certificateThumbprint + "\" not found in the " +
+                    "certificate store[Name=" + certStore.Name + ", Location=" + certStore.Location.ToString() + "].");
+            }
+            //else if (certCollection.Count == 0)
+            //{
+            //    throw new ArgumentException("Certificate with thumbprint \"" + certificateThumbprint + "\" not found in the " +
+            //        "certificate store[Name=" + certStore.Name + ", Location=" + certStore.Location.ToString() + "]. certCollection.Count == " +
+            //    certCollection.Count + ".");
+            //}
+
+            return cert;
         }
         #endregion
 
@@ -134,7 +154,7 @@ namespace ITPCfSQL.Azure.CLR
                 serviceName.Value,
                 deploymentSlots.Value);
 
-            var vmToAdd = (ITPCfSQL.Azure.Management.PersistentVMRole)result.RoleList.FirstOrDefault(item => item.RoleName == vmName.Value);
+            var vmToAdd = (ITPCfSQL.Azure.Management.PersistentVMRole)result.RoleList.FirstOrDefault(item => item.RoleName.Equals(vmName.Value, StringComparison.InvariantCultureIgnoreCase));
 
             if (vmToAdd == null)
                 throw new ArgumentException("No PersistentVMRole with name " + vmName.Value + " found in sgSubscriptionId = " +
