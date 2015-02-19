@@ -69,11 +69,13 @@
     <Compile Include="Exceptions\UnexpectedResponseTypeCodeException.cs" />
     <Compile Include="Internal\Constants.cs" />
     <Compile Include="Internal\JSON\InternalMethods.cs" />
-    <Compile Include="Internal\JSON\InternalSQLDatabase.cs" />
+    <Compile Include="Internal\InternalSQLDatabase.cs" />
     <Compile Include="Internal\Management.cs" />
     <Compile Include="Management\Deployment.cs" />
     <Compile Include="Management\Operation.cs" />
     <Compile Include="Management\Services.cs" />
+    <Compile Include="Responses\SQLDatabaseListServersResponseWithGeneric.cs" />
+    <Compile Include="Responses\SQLDatabaseListServersResponseWithoutGeneric.cs" />
     <Compile Include="TimeNormalization\DateValuePair.cs" />
     <Compile Include="TimeNormalization\Scatter\EvenlyDistribute.cs" />
     <Compile Include="TimeNormalization\Scatter\RandomScatter.cs" />
@@ -103,7 +105,6 @@
   <ItemGroup>
     <None Include="tempKey.snk" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
