@@ -1,5 +1,8 @@
 ITPCfSQL.SQL.Azure.sln.ide/storage.ide
+<<<<<<< HEAD
 ITPCfSQL.SQL.Azure.sln.ide/*
+=======
+>>>>>>> f7ce2cad41f9ca33a7b562dcbd7b89819cfcc9ee
 *.vsp
 *.psess
 

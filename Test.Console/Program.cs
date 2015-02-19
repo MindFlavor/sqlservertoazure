@@ -18,6 +18,10 @@ namespace TestConsole
         {
             //System.Console.WriteLine("Random:");
             //Test.Console.TestScatter.DoRandom();
+<<<<<<< HEAD
+=======
+
+>>>>>>> f7ce2cad41f9ca33a7b562dcbd7b89819cfcc9ee
             //System.Console.WriteLine("Evenly:");
             //Test.Console.TestScatter.DoEven();
 
