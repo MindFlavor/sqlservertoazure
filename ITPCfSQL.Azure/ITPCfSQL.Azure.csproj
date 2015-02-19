@@ -69,6 +69,7 @@
     <Compile Include="Exceptions\UnexpectedResponseTypeCodeException.cs" />
     <Compile Include="Internal\Constants.cs" />
     <Compile Include="Internal\JSON\InternalMethods.cs" />
+    <Compile Include="Internal\JSON\InternalSQLDatabase.cs" />
     <Compile Include="Internal\Management.cs" />
     <Compile Include="Management\Deployment.cs" />
     <Compile Include="Management\Operation.cs" />
