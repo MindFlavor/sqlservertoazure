@@ -8,6 +8,8 @@ namespace ITPCfSQL.Azure.Internal
 {
     public class InternalMethods
     {
+        public const string AZURE_VERSION = "2013-06-01";
+
         #region Queue
         public static string GetQueueUrl(bool useHTTPS, string accountName)
         {
@@ -2428,6 +2430,28 @@ namespace ITPCfSQL.Azure.Internal
         #endregion
 
         #endregion
+        #endregion
+
+        #region Private util methods
+        internal static T PerformSimpleGet<T>(Uri uri, System.Security.Cryptography.X509Certificates.X509Certificate2 certificate,
+            string azureVersion)
+        {
+            System.Net.HttpWebRequest Request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(uri);
+            Request.Method = "GET";
+            Request.Headers.Add(Constants.HEADER_VERSION, azureVersion);
+            Request.ClientCertificates.Add(certificate);
+
+            System.Net.HttpWebResponse response = (System.Net.HttpWebResponse)Request.GetResponse();
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                //string s = (new System.IO.StreamReader(response.GetResponseStream())).ReadToEnd();
+
+                System.Xml.Serialization.XmlSerializer ser = new System.Xml.Serialization.XmlSerializer(typeof(T));
+                return (T)ser.Deserialize(response.GetResponseStream());
+            }
+            else
+                throw new Exceptions.UnexpectedResponseTypeCodeException(System.Net.HttpStatusCode.OK, response.StatusCode);
+        }
         #endregion
     }
 }
