@@ -18,10 +18,6 @@ namespace TestConsole
         {
             //System.Console.WriteLine("Random:");
             //Test.Console.TestScatter.DoRandom();
-<<<<<<< HEAD
-=======
-
->>>>>>> f7ce2cad41f9ca33a7b562dcbd7b89819cfcc9ee
             //System.Console.WriteLine("Evenly:");
             //Test.Console.TestScatter.DoEven();
 
@@ -59,12 +55,12 @@ namespace TestConsole
 
             Guid gSubscription = Guid.Parse("002842b4-7fb0-4fd2-b269-1959fa60b89d");
 
-            //var serverWith = InternalSQLDatabase.ListServersWithGeneric(cert, gSubscription);
-            //var serverWithout = InternalSQLDatabase.ListServersWithoutGeneric(cert, gSubscription);
+            var serverWith = InternalSQLDatabase.ListServersWithGeneric(cert, gSubscription);
+            var serverWithout = InternalSQLDatabase.ListServersWithoutGeneric(cert, gSubscription);
+            
+            var dbs = InternalSQLDatabase.ListDatabases(cert, gSubscription, "ep014xe0is");
 
-            //var dbs = InternalSQLDatabase.ListDatabases(cert, gSubscription, "ep014xe0is");
-
-            var r = InternalResourceGroups.ListResourceGroups(cert, gSubscription);
+            //var r = InternalResourceGroups.ListResourceGroups(cert, gSubscription);
 
             return;
         }
