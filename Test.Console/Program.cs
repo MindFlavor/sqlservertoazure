@@ -55,12 +55,12 @@ namespace TestConsole
 
             Guid gSubscription = Guid.Parse("002842b4-7fb0-4fd2-b269-1959fa60b89d");
 
-            //var serverWith = InternalSQLDatabase.ListServersWithGeneric(cert, gSubscription);
-            //var serverWithout = InternalSQLDatabase.ListServersWithoutGeneric(cert, gSubscription);
+            var serverWith = InternalSQLDatabase.ListServersWithGeneric(cert, gSubscription);
+            var serverWithout = InternalSQLDatabase.ListServersWithoutGeneric(cert, gSubscription);
+            
+            var dbs = InternalSQLDatabase.ListDatabases(cert, gSubscription, "ep014xe0is");
 
-            //var dbs = InternalSQLDatabase.ListDatabases(cert, gSubscription, "ep014xe0is");
-
-            var r = InternalResourceGroups.ListResourceGroups(cert, gSubscription);
+            //var r = InternalResourceGroups.ListResourceGroups(cert, gSubscription);
 
             return;
         }

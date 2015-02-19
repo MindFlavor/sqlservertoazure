@@ -73,6 +73,7 @@ namespace ITPCfSQL.Azure.Internal
                 "databases?contentview=generic");
 
             return InternalMethods.PerformSimpleGet<Responses.SQLDatabase.ListDatabases.Response>(uri, certificate, AZURE_VERSION);
+
         }
     }
 }
