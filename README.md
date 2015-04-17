@@ -78,7 +78,6 @@ In order to install the library refer to the Readme.PDF file embedded in the exa
 4. Map the SQLCLR functions/SPs to the corresponding T-SQL ones. For that, you can use the [Creation.sql script](https://github.com/MindFlavor/sqlservertoazure/blob/master/ITPCfSQL.Azure.CLR/SQL.Scripts/Creation.sql) shipped with the library.
 
 ```SQL
-{{
 CREATE ASYMMETRIC KEY ['<asymmetric_key_name, sysname, SampleAzureKey>'] FROM EXECUTABLE FILE = '<full_file_path, nvarchar(4000), Enter the full DLL path>'
 CREATE LOGIN ['<asymmetric_login_name, sysname, SampleAzureLogin>'] FROM ASYMMETRIC KEY ['<asymmetric_key_name, sysname, SampleAzureKey>'];
 
@@ -88,7 +87,6 @@ GO
 CREATE ASSEMBLY [ITPCfSQL.Azure.CLR] FROM '<full_file_path, nvarchar(4000), Enter the full DLL path>'
 WITH PERMISSION_SET=EXTERNAL_ACCESS;
 GO
-}}
 ```
 
 
