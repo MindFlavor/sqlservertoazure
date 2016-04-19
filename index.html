@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>SQL Server to Azure by MindFlavor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">SQL Server to Azure</h1>
+      <h2 class="project-tagline">Microsoft SQL Server CLR Azure Methods</h2>
+      <a href="https://github.com/MindFlavor/sqlservertoazure" class="btn">View on GitHub</a>
+      <a href="https://github.com/MindFlavor/sqlservertoazure/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/MindFlavor/sqlservertoazure/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="sql-server-to-azure" class="anchor" href="#sql-server-to-azure" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>SQL Server to Azure</h1>
+
+<h4>
+<a id="microsoft-sql-server-clr-azure-methods" class="anchor" href="#microsoft-sql-server-clr-azure-methods" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Microsoft SQL Server CLR Azure Methods</h4>
+
+<p><a href="LICENSE"><img src="https://img.shields.io/github/license/mashape/apistatus.svg" alt="license"></a></p>
+
+<h2>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Introduction</h2>
+
+<p>With the advent of Microsoft SQL Server 2012 SP1 CU2 Microsoft allows you to leverage many Windows Azure storage features right from SQL Server (such as backup/restore off an Azure blob).
+With Microsoft SQL Server 2014 it will be possible to place datafiles and transaction logs directly in the Windows Azure containers as blobs. 
+ Many of those features, however, may require you to leave SSMS and resort to other means in order to control the Windows Azure platform. </p>
+
+<h2>
+<a id="why-sql-server" class="anchor" href="#why-sql-server" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Why SQL Server?</h2>
+
+<p>There are many libraries for Azure interaction. C#, PowerShell and so on. But what about SQL Server and its T-SQL? Since SQL Server 2014 the integration with Azure is good enough to warrant a dedicated library. </p>
+
+<ul>
+<li>Do you want to enumerate your blobs? Query the relevant table! </li>
+<li>Do you need to import/export from Azure tables in your SQL Server Database? Use a simple <code>SELECT INTO</code>!</li>
+<li>Need to push events to an Azure Queue? Call a simple stored procedure!</li>
+</ul>
+
+<h3>
+<a id="examples" class="anchor" href="#examples" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Examples</h3>
+
+<p>For example, as detailed in this Igor Pagliai’s post (<a href="http://blogs.msdn.com/b/igorpag/archive/2013/10/23/create-a-sql-server-2014-database-directly-on-azure-blob-storage-with-sqlxi.aspx">http://blogs.msdn.com/b/igorpag/archive/2013/10/23/create-a-sql-server-2014-database-directly-on-azure-blob-storage-with-sqlxi.aspx</a>), you cannot break blob leases using SQL Server. With this CLR library, all you have to do is to call the right stored procedure: </p>
+
+<div class="highlight highlight-source-sql"><pre>EXEC [Azure].BreakBlobLeaseImmediately  
+    <span class="pl-s"><span class="pl-pds">'</span>AccountName<span class="pl-pds">'</span></span>,
+    <span class="pl-s"><span class="pl-pds">'</span>SharedKey<span class="pl-pds">'</span></span>,
+    <span class="pl-c1">1</span>,
+    <span class="pl-s"><span class="pl-pds">'</span>ContainerName<span class="pl-pds">'</span></span>,
+    <span class="pl-s"><span class="pl-pds">'</span>BlobName<span class="pl-pds">'</span></span></pre></div>
+
+<p>And you are ready to go :).</p>
+
+<p>As another example, with this code you enumerate all your containers:</p>
+
+<div class="highlight highlight-source-sql"><pre><span class="pl-k">SELECT</span> <span class="pl-k">*</span> <span class="pl-k">FROM</span>  [Azure].ListContainers(
+    <span class="pl-s"><span class="pl-pds">'</span>AccountName<span class="pl-pds">'</span></span>, 
+    <span class="pl-s"><span class="pl-pds">'</span>SharedKey<span class="pl-pds">'</span></span>, 
+    <span class="pl-c1">1</span>, 
+    <span class="pl-k">NULL</span>);          </pre></div>
+
+<p>Each container can be enumerated too:</p>
+
+<div class="highlight highlight-source-sql"><pre><span class="pl-k">SELECT</span> <span class="pl-k">*</span> <span class="pl-k">FROM</span>  [Azure].ListBlobs(
+    <span class="pl-s"><span class="pl-pds">'</span>AccountName<span class="pl-pds">'</span></span>, 
+        <span class="pl-s"><span class="pl-pds">'</span>SharedKey<span class="pl-pds">'</span></span>, 
+    <span class="pl-c1">1</span>, 
+    <span class="pl-s"><span class="pl-pds">'</span>ContainerName<span class="pl-pds">'</span></span>,        
+    <span class="pl-c1">1</span>,                      
+    <span class="pl-c1">1</span>,                      
+    <span class="pl-c1">1</span>,              
+    <span class="pl-c1">1</span>,                      
+    <span class="pl-k">NULL</span>);              </pre></div>
+
+<p>More examples here: <a href="http://blogs.technet.com/b/italian_premier_center_for_sql_server/">TechNet Blogs: Italian Premier Center for SQL Server</a> or in my MSDN blog <a href="http://blogs.msdn.com/b/frcogno">http://blogs.msdn.com/b/frcogno</a>.</p>
+
+<p><em>Feel free to contribute with ideas!</em> :)</p>
+
+<h3>
+<a id="about-the-windows-azure-rest-api-from-sqlclr" class="anchor" href="#about-the-windows-azure-rest-api-from-sqlclr" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>About the Windows Azure REST API from SQLCLR</h3>
+
+<p>This library will allow you to work with blobs, tables and queues, to handle ACLs and metadata. </p>
+
+<p>I recently had a session at SQLRally Amsterdam about this topic, as soon as the video becomes available I will add it here.</p>
+
+<p>Right now it supports:</p>
+
+<ul>
+<li>
+<a href="http://msdn.microsoft.com/en-us/library/windowsazure/dd179363.aspx">Windows Azure Queue storage</a>.</li>
+<li>
+<a href="http://msdn.microsoft.com/en-us/library/windowsazure/dd179423.aspx">Windows Azure Table storage</a>.</li>
+<li>
+<a href="http://msdn.microsoft.com/en-us/library/windowsazure/dd135733.aspx">Windows Azure blob storage</a> (both page and block).</li>
+</ul>
+
+<p>There are still missing functionality. For example the <a href="http://msdn.microsoft.com/en-us/library/windowsazure/dd179467.aspx">Put block list</a> functionality is not implemented yet.</p>
+
+<p>Note that the library target is framework 4.5 so it will work out of the box with Microsoft SQL Server 2012/2014. If you need to use it with any previous SQL Server version you might need to recompile it. </p>
+
+<h3>
+<a id="how-to-try-it" class="anchor" href="#how-to-try-it" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to try it</h3>
+
+<p>In a nutshell, all you have to do is:</p>
+
+<ol>
+<li>Download/clone the code and compile it.</li>
+<li>Put the DLLs into a convenient location (ie reachable from Microsoft SQL Server).</li>
+<li>Run the following script but make sure to replace the parameters first (ie with CTRL-Shift-M in SSMS).</li>
+<li>Map the SQLCLR functions/SPs to the corresponding T-SQL ones. For that, you can use the <a href="https://github.com/MindFlavor/sqlservertoazure/blob/master/ITPCfSQL.Azure.CLR/SQL.Scripts/Creation.sql">Creation.sql script</a> shipped with the library.</li>
+</ol>
+
+<div class="highlight highlight-source-sql"><pre>CREATE ASYMMETRIC KEY [<span class="pl-s"><span class="pl-pds">'</span>&lt;asymmetric_key_name, sysname, SampleAzureKey&gt;<span class="pl-pds">'</span></span>] <span class="pl-k">FROM</span> EXECUTABLE FILE <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>&lt;full_file_path, nvarchar(4000), Enter the full DLL path&gt;<span class="pl-pds">'</span></span>
+CREATE LOGIN [<span class="pl-s"><span class="pl-pds">'</span>&lt;asymmetric_login_name, sysname, SampleAzureLogin&gt;<span class="pl-pds">'</span></span>] <span class="pl-k">FROM</span> ASYMMETRIC KEY [<span class="pl-s"><span class="pl-pds">'</span>&lt;asymmetric_key_name, sysname, SampleAzureKey&gt;<span class="pl-pds">'</span></span>];
+
+<span class="pl-k">GRANT</span> EXTERNAL ACCESS ASSEMBLY TO [<span class="pl-s"><span class="pl-pds">'</span>&lt;asymmetric_login_name, sysname, SampleAzureLogin&gt;<span class="pl-pds">'</span></span>];
+GO
+
+CREATE ASSEMBLY [<span class="pl-c1">ITPCfSQL</span>.<span class="pl-c1">Azure</span>.CLR] <span class="pl-k">FROM</span> <span class="pl-s"><span class="pl-pds">'</span>&lt;full_file_path, nvarchar(4000), Enter the full DLL path&gt;<span class="pl-pds">'</span></span>
+WITH PERMISSION_SET<span class="pl-k">=</span>EXTERNAL_ACCESS;
+GO</pre></div>
+
+<h3>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h3>
+
+<p>Please see <a href="https://github.com/MindFlavor/sqlservertoazure/blob/master/LICENSE">LICENSE</a> file.</p>
+
+<p>Happy Coding,
+<a href="mailto:francesco.cogno@outlook.com">Francesco Cogno</a>.</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/MindFlavor/sqlservertoazure">SQL Server to Azure</a> is maintained by <a href="https://github.com/MindFlavor">MindFlavor</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
