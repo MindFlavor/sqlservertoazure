@@ -70,7 +70,7 @@ There are still missing functionality. For example the [Put block list](http://m
 Note that the library target is framework 4.5 so it will work out of the box with Microsoft SQL Server 2012/2014. If you need to use it with any previous SQL Server version you might need to recompile it. 
 
 ### How to try it
-In order to install the library refer to the Readme.PDF file embedded in the example file. In a nutshell, all you have to do is:
+In a nutshell, all you have to do is:
 
 1. Download/clone the code and compile it.
 2. Put the DLLs into a convenient location (ie reachable from Microsoft SQL Server).
