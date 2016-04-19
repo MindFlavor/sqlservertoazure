@@ -1,6 +1,6 @@
-# sqlservertoazure
-Microsoft SQL Server CLR Azure Methods
-
+# SQL Server to Azure
+#### Microsoft SQL Server CLR Azure Methods
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
 
 ## Introduction
 With the advent of Microsoft SQL Server 2012 SP1 CU2 Microsoft allows you to leverage many Windows Azure storage features right from SQL Server (such as backup/restore off an Azure blob).
@@ -89,6 +89,9 @@ WITH PERMISSION_SET=EXTERNAL_ACCESS;
 GO
 ```
 
+### License
+
+Please see [LICENSE](https://github.com/MindFlavor/sqlservertoazure/blob/master/LICENSE) file.
 
 Happy Coding,
 [Francesco Cogno](mailto:francesco.cogno@outlook.com).
