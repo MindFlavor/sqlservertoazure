@@ -56,7 +56,7 @@ namespace ITPCfSQL.Azure
             {
                 string res = Internal.InternalMethods.ListBlobs(
                     AzureBlobService.AccountName, AzureBlobService.SharedKey, AzureBlobService.UseHTTPS,
-                    this.Name, prefix,
+                    this.Name, prefix, strNextMarker
                     IncludeSnapshots: includeSnapshots,
                     IncludeMetadata: includeMetadata,
                     IncludeCopy: includeCopy,
